@@ -3,7 +3,11 @@ import VenteService from "./ventes.service.js";
 class VenteController {
   static createVente = async (req, res) => {
     try {
-      const result = await VenteService.createVente(req.body);
+      const payload = {
+        ...req.body,
+        user_id: req.body.user_id || req.user?.id,
+      };
+      const result = await VenteService.createVente(payload);
       return res.status(201).json({
         success: true,
         data: result,
@@ -73,7 +77,7 @@ class VenteController {
 
   static deleteVente = async (req, res) => {
     try {
-      const deletedVente = await VenteService.deleteVenteById(req.params.id);
+      const deletedVente = await VenteService.deleteVenteById(req.params.id, req.user?.id);
       if (!deletedVente) {
         return res.status(404).json({ success: false, error: "Vente introuvable" });
       }

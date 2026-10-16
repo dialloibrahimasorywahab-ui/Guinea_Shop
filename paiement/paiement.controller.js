@@ -3,11 +3,15 @@ import PaiementService from "./paiement.service.js";
 class PaiementController {
   static createPaiement = async (req, res) => {
     try {
-      const paiement = await PaiementService.createPaiement(req.body);
+      const payload = {
+        ...req.body,
+        user_id: req.body.user_id || req.user?.id,
+      };
+      const result = await PaiementService.createPaiement(payload);
       return res.status(201).json({
         success: true,
-        data: paiement,
-        message: "Paiement enregistré avec succès",
+        data: result,
+        message: "Paiement enregistré et intégré dans Finances avec succès",
       });
     } catch (error) {
       return res.status(400).json({ success: false, error: error.message });

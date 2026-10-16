@@ -1,18 +1,34 @@
 import express from "express";
 import ClientController from "./clients.controller.js";
+import verifyAccessToken from "../common/middleware/verifytoken.js";
+import authorize from "../common/middleware/authorize.js";
+import validate from "../common/validator/validator.js";
+import { createClientSchema, updateClientSchema } from "./clients.validator.js";
 
 const router = express.Router();
 
-// Routes spécifiques
-router.get("/all", ClientController.getAllClients);
-router.get("/telephone/:telephone", ClientController.getClientByTelephone);
+// Consultation : admin, gestionnaire et caissier
+router.get("/all", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissier'), ClientController.getAllClients);
+router.get("/telephone/:telephone", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissier'), ClientController.getClientByTelephone);
+router.get("/:id", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissier'), ClientController.getClientById);
 
-// Création d'un client
-router.post("/", ClientController.createClient);
+// Création & modification avec validation Yup
+router.post(
+  "/",
+  verifyAccessToken,
+  authorize('admin', 'gestionnaire', 'caissier'),
+  validate(createClientSchema),
+  ClientController.createClient
+);
+router.put(
+  "/:id",
+  verifyAccessToken,
+  authorize('admin', 'gestionnaire', 'caissier'),
+  validate(updateClientSchema),
+  ClientController.updateClient
+);
 
-// Routes dynamiques par ID
-router.get("/:id", ClientController.getClientById);
-router.put("/:id", ClientController.updateClient);
-router.delete("/:id", ClientController.deleteClient);
+// Suppression : réservée à l'admin
+router.delete("/:id", verifyAccessToken, authorize('admin'), ClientController.deleteClient);
 
 export default router;

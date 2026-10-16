@@ -1,12 +1,15 @@
 import articleModel from "./models/articles.models.js";
 
 class ArticleRepository {
-  static createArticle = async (data) => {
-    return await articleModel.create(data);
+  static createArticle = async (data, session = null) => {
+    const article = new articleModel(data);
+    return await article.save(session ? { session } : undefined);
   };
 
-  static getArticleById = async (id) => {
-    return await articleModel.findById(id).populate('fournisseur_id').populate('categorie_id');
+  static getArticleById = async (id, session = null) => {
+    const query = articleModel.findById(id).populate('fournisseur_id').populate('categorie_id');
+    if (session) query.session(session);
+    return await query;
   };
 
   static getAllArticles = async () => {
@@ -27,17 +30,17 @@ class ArticleRepository {
     }).populate('fournisseur_id').populate('categorie_id');
   };
 
-  static updateArticle = async (id, update) => {
+  static updateArticle = async (id, update, session = null) => {
     return await articleModel.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
+      ...(session ? { session } : {}),
     }).populate('fournisseur_id').populate('categorie_id');
   };
 
-  static deleteArticle = async (id) => {
-    return await articleModel.findByIdAndDelete(id);
+  static deleteArticle = async (id, session = null) => {
+    return await articleModel.findByIdAndDelete(id, session ? { session } : undefined);
   };
 }
 
 export default ArticleRepository;
-

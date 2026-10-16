@@ -1,23 +1,33 @@
 import express from "express";
 import CategoryController from "./categories.controller.js";
+import verifyAccessToken from "../common/middleware/verifytoken.js";
+import authorize from "../common/middleware/authorize.js";
+import validate from "../common/validator/validator.js";
+import { createCategorySchema, updateCategorySchema } from "./categories.validator.js";
 
 const router = express.Router();
 
-// Routes spécifiques (précèdent /:id)
-// recuperer toutes les categories des produits disponibles
-router.get("/all", CategoryController.getAllCategories);
+// Consultation : accessible à tout utilisateur authentifié
+router.get("/all", verifyAccessToken, CategoryController.getAllCategories);
+router.get("/:id", verifyAccessToken, CategoryController.getCategoryById);
 
-// Création d'une catégorie d'un produit
-router.post("/", CategoryController.createCategory);
+// Création & modification : admin et gestionnaire avec validation Yup
+router.post(
+  "/",
+  verifyAccessToken,
+  authorize('admin', 'gestionnaire'),
+  validate(createCategorySchema),
+  CategoryController.createCategory
+);
+router.put(
+  "/:id",
+  verifyAccessToken,
+  authorize('admin', 'gestionnaire'),
+  validate(updateCategorySchema),
+  CategoryController.updateCategory
+);
 
-// Routes dynamiques par ID
-// Route de recuperation d'une categorie de produit par son id
-router.get("/:id", CategoryController.getCategoryById);
-
-// Pour la mise à jour d'une categorie 
-router.put("/:id", CategoryController.updateCategory);
-
-// pour la supression d'une categorie 
-router.delete("/:id", CategoryController.deleteCategory);
+// Suppression : réservée à l'admin
+router.delete("/:id", verifyAccessToken, authorize('admin'), CategoryController.deleteCategory);
 
 export default router;

@@ -1,64 +1,102 @@
-import StockRepository from "./stock.repositories.js";
 import ArticleRepository from "../articles/articles.repositories.js";
+import MouvementStockService from "../Mouvement_stock/mouvement_stock.service.js";
 
 class StockService {
-  static createStockMouvement = async (data) => {
-    const { article_id, user_id, typeMouvement, quantite } = data;
+  /**
+   * Consultation de l'état actuel des stocks de tous les articles avec valorisation
+   */
+  static getEtatStock = async () => {
+    const articles = await ArticleRepository.getAllArticles();
 
-    const article = await ArticleRepository.getArticleById(article_id);
-    if (!article) {
-      throw new Error(`Article ID ${article_id} introuvable`);
-    }
+    let quantiteTotale = 0;
+    let valeurTotale = 0;
+    let nbArticlesEnAlerte = 0;
 
-    if (typeMouvement === 'entrée') {
-      article.quantiteEnStock += quantite;
-    } else if (typeMouvement === 'sortie') {
-      if (article.quantiteEnStock < quantite) {
-        throw new Error(
-          `Stock insuffisant pour l'article "${article.libelle}". Disponible: ${article.quantiteEnStock}, Demandé: ${quantite}`
-        );
-      }
-      article.quantiteEnStock -= quantite;
-    } else if (typeMouvement === 'ajustement') {
-      article.quantiteEnStock = quantite;
-    } else {
-      throw new Error("Type de mouvement invalide. Utilisez: 'entrée', 'sortie' ou 'ajustement'");
-    }
+    const stockDetails = articles.map((art) => {
+      const qte = art.quantiteEnStock || 0;
+      const pu = art.prixUnitaire || 0;
+      const seuil = art.seuilAlerte || 5;
+      const valeur = qte * pu;
+      const enAlerte = qte <= seuil;
 
-    await article.save();
+      quantiteTotale += qte;
+      valeurTotale += valeur;
+      if (enAlerte) nbArticlesEnAlerte += 1;
 
-    const mouvement = await StockRepository.createStockMouvement({
-      article_id,
-      user_id,
-      typeMouvement,
-      quantite,
+      return {
+        article_id: art._id,
+        libelle: art.libelle,
+        categorie: art.categorie_id?.nom || 'Sans catégorie',
+        fournisseur: art.fournisseur_id?.nom || 'Sans fournisseur',
+        quantiteEnStock: qte,
+        seuilAlerte: seuil,
+        prixUnitaire: pu,
+        valeurStock: valeur,
+        statut: enAlerte ? 'alerte' : 'normal',
+      };
     });
 
-    return await StockRepository.getStockById(mouvement._id);
+    return {
+      nbArticles: articles.length,
+      nbArticlesEnAlerte,
+      quantiteTotale,
+      valeurTotale,
+      articles: stockDetails,
+    };
   };
 
-  static getStockById = async (id) => {
-    return await StockRepository.getStockById(id);
+  /**
+   * Récupération des articles sous le seuil d'alerte (besoin de réapprovisionnement)
+   */
+  static getArticlesEnAlerte = async () => {
+    const articles = await ArticleRepository.getArticlesEnAlerte();
+    return articles.map((art) => ({
+      article_id: art._id,
+      libelle: art.libelle,
+      quantiteEnStock: art.quantiteEnStock,
+      seuilAlerte: art.seuilAlerte,
+      fournisseur: art.fournisseur_id?.nom || 'Non défini',
+      prixUnitaire: art.prixUnitaire,
+    }));
   };
 
-  static getAllStockMouvements = async () => {
-    return await StockRepository.getAllStockMouvements();
+  /**
+   * Niveau de stock d'un article spécifique
+   */
+  static getStockByArticleId = async (articleId) => {
+    const article = await ArticleRepository.getArticleById(articleId);
+    if (!article) {
+      throw new Error(`Article ID ${articleId} introuvable`);
+    }
+
+    const qte = article.quantiteEnStock || 0;
+    const seuil = article.seuilAlerte || 5;
+
+    return {
+      article_id: article._id,
+      libelle: article.libelle,
+      quantiteEnStock: qte,
+      seuilAlerte: seuil,
+      prixUnitaire: article.prixUnitaire,
+      valeurStock: qte * (article.prixUnitaire || 0),
+      statut: qte <= seuil ? 'alerte' : 'normal',
+    };
   };
 
-  static getMouvementsByArticle = async (articleId) => {
-    return await StockRepository.getMouvementsByArticle(articleId);
-  };
+  /**
+   * Ajustement manuel de stock (ex: inventaire physique annuel ou correction de stock)
+   * Déclenche de façon atomique un mouvement dans Mouvement_stock avec type 'ajustement'
+   */
+  static ajusterStock = async (data) => {
+    const { article_id, nouvelleQuantite, motif, user_id } = data;
 
-  static getMouvementsByType = async (typeMouvement) => {
-    return await StockRepository.getMouvementsByType(typeMouvement);
-  };
-
-  static deleteStockMouvement = async (id) => {
-    return await StockRepository.deleteStockMouvement(id);
-  };
-
-  static deleteStockMouvementById = async (id) => {
-    return await StockRepository.deleteStockMouvement(id);
+    return await MouvementStockService.createMouvement({
+      article_id,
+      user_id,
+      typeMouvement: 'ajustement',
+      quantite: Number(nouvelleQuantite),
+      motif: motif || 'Ajustement manuel inventaire',
+    });
   };
 }
 

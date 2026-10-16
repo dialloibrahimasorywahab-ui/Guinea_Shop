@@ -1,70 +1,68 @@
 import StockService from "./stock.service.js";
 
 class StockController {
-  static createStockMouvement = async (req, res) => {
+  /**
+   * Consultation de l'état global et valorisation du stock
+   */
+  static getEtatStock = async (req, res) => {
     try {
-      const mouvement = await StockService.createStockMouvement(req.body);
-      return res.status(201).json({
+      const etat = await StockService.getEtatStock();
+      return res.status(200).json({
         success: true,
-        data: mouvement,
-        message: "Mouvement de stock enregistré avec succès",
+        data: etat,
+        message: "État global des stocks et valorisation",
       });
-    } catch (error) {
-      return res.status(400).json({ success: false, error: error.message });
-    }
-  };
-
-  static getAllStockMouvements = async (req, res) => {
-    try {
-      const mouvements = await StockService.getAllStockMouvements();
-      return res.status(200).json({ success: true, data: mouvements });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });
     }
   };
 
-  static getStockById = async (req, res) => {
+  /**
+   * Consultation des articles sous le seuil d'alerte
+   */
+  static getArticlesEnAlerte = async (req, res) => {
     try {
-      const mouvement = await StockService.getStockById(req.params.id);
-      if (!mouvement) {
-        return res.status(404).json({ success: false, error: "Mouvement de stock introuvable" });
-      }
-      return res.status(200).json({ success: true, data: mouvement });
-    } catch (error) {
-      return res.status(400).json({ success: false, error: error.message });
-    }
-  };
-
-  static getMouvementsByArticle = async (req, res) => {
-    try {
-      const { articleId } = req.params;
-      const mouvements = await StockService.getMouvementsByArticle(articleId);
-      return res.status(200).json({ success: true, data: mouvements });
-    } catch (error) {
-      return res.status(400).json({ success: false, error: error.message });
-    }
-  };
-
-  static getMouvementsByType = async (req, res) => {
-    try {
-      const { type } = req.params;
-      const mouvements = await StockService.getMouvementsByType(type);
-      return res.status(200).json({ success: true, data: mouvements });
-    } catch (error) {
-      return res.status(400).json({ success: false, error: error.message });
-    }
-  };
-
-  static deleteStockMouvement = async (req, res) => {
-    try {
-      const deletedMouvement = await StockService.deleteStockMouvementById(req.params.id);
-      if (!deletedMouvement) {
-        return res.status(404).json({ success: false, error: "Mouvement de stock introuvable" });
-      }
+      const articles = await StockService.getArticlesEnAlerte();
       return res.status(200).json({
         success: true,
-        data: deletedMouvement,
-        message: "Mouvement de stock supprimé avec succès",
+        data: articles,
+        message: "Articles en alerte de stock",
+      });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  };
+
+  /**
+   * Consultation du stock d'un article spécifique
+   */
+  static getStockByArticleId = async (req, res) => {
+    try {
+      const { articleId } = req.params;
+      const stock = await StockService.getStockByArticleId(articleId);
+      return res.status(200).json({
+        success: true,
+        data: stock,
+      });
+    } catch (error) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+  };
+
+  /**
+   * Ajustement manuel de stock (inventaire physique)
+   */
+  static ajusterStock = async (req, res) => {
+    try {
+      const payload = {
+        ...req.body,
+        user_id: req.body.user_id || req.user?.id,
+      };
+      const result = await StockService.ajusterStock(payload);
+      return res.status(200).json({
+        success: true,
+        data: result,
+        message: "Stock ajusté avec succès et mouvement tracé",
       });
     } catch (error) {
       return res.status(400).json({ success: false, error: error.message });

@@ -1,16 +1,17 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gh_maick';
-
+/**
+ * Établit la connexion à la base de données MongoDB
+ * @returns {Promise<typeof mongoose>}
+ */
 const connectDB = async () => {
+  const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/gh_maick';
   try {
-    await mongoose.connect(MONGO_URI);
-    console.log('MongoDB connecté avec succès');
+    const conn = await mongoose.connect(dbUrl);
+    console.log(`✅ Connexion MongoDB réussie sur : ${conn.connection.host}/${conn.connection.name}`);
+    return conn;
   } catch (error) {
-    console.error('Erreur de connexion MongoDB :', error.message);
+    console.error('❌ Échec de la connexion à MongoDB :', error.message);
     throw error;
   }
 };

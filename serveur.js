@@ -1,40 +1,37 @@
-console.log("ibstech");
-
-import express from 'express';
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import serveur from './app.js';
 import connectDB from './config/db/db.config.js';
-import usersRoutes from './users/users.routes.js';
-import clientsRoutes from './clients/clients.routes.js';
-import fournisseursRoutes from './fournisseur/fournisseur.routes.js';
-import articlesRoutes from './articles/articles.routes.js';
-import ventesRoutes from './ventes/ventes.routes.js';
-import stockRoutes from './stock/stock.routes.js';
-import ligneVentesRoutes from './ligne_ventes/ligne_ventes.routes.js';
-import paiementsRoutes from './paiement/paiement.routes.js';
-// import categoriesRoutes from './categories/categories.routes.js';
-// import statistiquesRoutes from './statistiques/statistique.routes.js';
 
-const serveur = express();
-
-serveur.use(express.json());
-serveur.use(express.urlencoded({ extended: true }));
-
-serveur.use('/users', usersRoutes);
-serveur.use('/clients', clientsRoutes);
-serveur.use('/fournisseurs', fournisseursRoutes);
-serveur.use('/articles', articlesRoutes);
-serveur.use('/ventes', ventesRoutes);
-serveur.use('/stock', stockRoutes);
-serveur.use('/ligne-ventes', ligneVentesRoutes);
-serveur.use('/paiements', paiementsRoutes);
+const PORT = process.env.PORT || 8000;
 
 const startServer = async () => {
   try {
+    // 1. Établir la connexion à MongoDB avant d'ouvrir le port HTTP
+    console.log("Tentative de connexion à MongoDB...");
     await connectDB();
-    serveur.listen(8000, () => {
-      console.log('le serveur est lancé sur le port 8000');
+
+    // 2. Démarrer le serveur Express uniquement si la base est connectée
+    const serverInstance = serveur.listen(PORT, () => {
+      console.log(`🚀 Serveur opérationnel et à l'écoute sur http://localhost:${PORT}`);
     });
+
+    // 3. Gestion propre de l'arrêt du serveur (Graceful Shutdown)
+    const gracefulShutdown = async (signal) => {
+      console.log(`\nSignal [${signal}] reçu : fermeture gracieuse du serveur...`);
+      serverInstance.close(async () => {
+        console.log("Serveur HTTP fermé.");
+        await mongoose.connection.close();
+        console.log("Connexion MongoDB fermée.");
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
   } catch (error) {
-    console.error('Erreur de démarrage du serveur :', error.message);
+    console.error('❌ Échec critique au démarrage du serveur :', error.message);
     process.exit(1);
   }
 };

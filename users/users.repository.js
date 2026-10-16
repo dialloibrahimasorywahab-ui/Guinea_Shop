@@ -17,8 +17,12 @@ class UserRepository {
     return await userModel.find({ role });
   };
 
-  static getUserByEmail = async (email) => {
-    return await userModel.findOne({ email });
+  static getUserByEmail = async (email, withPassword = false) => {
+    const query = userModel.findOne({ email });
+    if (withPassword) {
+      query.select('+password');
+    }
+    return await query;
   };
 
   static updateUser = async (id, update) => {

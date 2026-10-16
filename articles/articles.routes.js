@@ -1,20 +1,22 @@
 import express from "express";
 import ArticleController from "./articles.controller.js";
+import verifyAccessToken from "../common/middleware/verifytoken.js";
+import authorize from "../common/middleware/authorize.js";
 
 const router = express.Router();
 
-// Routes spécifiques (doivent précéder /:id)
-router.get("/all", ArticleController.getAllArticles);
-router.get("/alerte", ArticleController.getArticlesEnAlerte);
-router.get("/fournisseur/:fournisseurId", ArticleController.getArticlesByFournisseur);
-router.get("/categorie/:categorieId", ArticleController.getArticlesByCategorie);
+// Consultation : accessible à tout utilisateur authentifié
+router.get("/all", verifyAccessToken, ArticleController.getAllArticles);
+router.get("/alerte", verifyAccessToken, authorize('admin', 'gestionnaire'), ArticleController.getArticlesEnAlerte);
+router.get("/fournisseur/:fournisseurId", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissier'), ArticleController.getArticlesByFournisseur);
+router.get("/categorie/:categorieId", verifyAccessToken, ArticleController.getArticlesByCategorie);
+router.get("/:id", verifyAccessToken, ArticleController.getArticleById);
 
-// Création d'un article
-router.post("/", ArticleController.createArticle);
+// Création & modification : admin et gestionnaire
+router.post("/", verifyAccessToken, authorize('admin', 'gestionnaire'), ArticleController.createArticle);
+router.put("/:id", verifyAccessToken, authorize('admin', 'gestionnaire'), ArticleController.updateArticle);
 
-// Routes dynamiques par ID
-router.get("/:id", ArticleController.getArticleById);
-router.put("/:id", ArticleController.updateArticle);
-router.delete("/:id", ArticleController.deleteArticle);
+// Suppression : réservée à l'admin
+router.delete("/:id", verifyAccessToken, authorize('admin'), ArticleController.deleteArticle);
 
 export default router;

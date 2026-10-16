@@ -15,6 +15,26 @@ class FactureController {
     }
   };
 
+  /**
+   * Payer une facture directement (encaissement atomique + mise à jour trésorerie Finances)
+   */
+  static payerFacture = async (req, res) => {
+    try {
+      const payload = {
+        ...req.body,
+        user_id: req.body.user_id || req.user?.id,
+      };
+      const result = await FactureService.payerFacture(req.params.id, payload);
+      return res.status(200).json({
+        success: true,
+        data: result,
+        message: "Paiement de la facture validé et intégré dans Finances avec succès",
+      });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+  };
+
   static getAllFactures = async (req, res) => {
     try {
       const factures = await FactureService.getAllFactures();

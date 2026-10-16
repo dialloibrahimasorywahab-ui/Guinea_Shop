@@ -10,15 +10,16 @@ const paiementSchema = new Schema(
     modePaiement: {
       type: String,
       enum: {
-        values: ['espèce', 'carte', 'chèque', 'virement'],
-        message: 'Le mode de paiement doit être espèce, carte, chèque ou virement',
+        values: ['espèces', 'espèce', 'carte', 'chèque', 'virement', 'mobile_money', 'Mobile Money', 'autre'],
+        message: 'Mode de paiement non valide',
       },
       required: [true, 'Le mode de paiement est requis'],
+      default: 'espèces',
     },
     montant: {
       type: Number,
       required: [true, 'Le montant est requis'],
-      min: [0, 'Le montant ne peut pas être négatif'],
+      min: [0.01, 'Le montant doit être supérieur à 0'],
     },
     datePaiement: {
       type: Date,
@@ -26,8 +27,8 @@ const paiementSchema = new Schema(
     },
     statut: {
       type: String,
-      enum: ['valide', 'echoue', 'en_attente'],
-      default: 'en_attente',
+      enum: ['validé', 'valide', 'échoué', 'echoue', 'en_attente', 'credit'],
+      default: 'validé',
     },
   },
   { timestamps: true }
