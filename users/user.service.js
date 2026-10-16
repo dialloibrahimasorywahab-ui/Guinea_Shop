@@ -6,20 +6,22 @@ import bcrypt from "bcrypt"
 
 class UserService {
   static createUser = async (data) => {
-    // verifier si un utilisateur n'a pas cet email deja 
-    const user = await UserRepository.getUserByEmail(data.email)
+    // Vérifier si un utilisateur a déjà cet email
+    const existingUser = await UserRepository.getUserByEmail(data.email);
+    if (existingUser) {
+      throw new Error("Cet email est déjà utilisé");
+    }
 
-    if (!user) throw new Error("cet email existe déjà ")
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const newUser = await UserRepository.createUser({
+      ...data,
+      password: hashedPassword,
+    });
 
-    const hashPassword = await bcrypt.hash(data.password, 10);
-    const newUser = await UserRepository.createUser(data)
-
-    // creation du token de connexion 
-    const token = JwtUtils.generateAccessToken({ id: newUser.id, email: newUser.email });
+    // Création du token de connexion
+    const token = JwtUtils.generateAccessToken({ id: newUser._id, email: newUser.email, role: newUser.role });
 
     return { user: newUser, token };
-
-
   };
 
   // recuperation d'un utilisateur par son id 
@@ -43,7 +45,7 @@ class UserService {
 
   static updateUser = async (id, update) => {
     if (update.password) {
-      update.password = userModel.hashPassword(update.password);
+      update.password = await bcrypt.hash(update.password, 10);
     }
     return await UserRepository.updateUser(id, update);
   };
@@ -58,10 +60,10 @@ class UserService {
 
   // Declaration de la methode de login
   static login = async (email, password) => {
-    const user = await UserRepository.getUserByEmail(email);
+    const user = await UserRepository.getUserByEmail(email, true);
     // verification du login ou de l'email
     if (!user) {
-      throw new Error("Email ou Mot de passe incorrecte ")
+      throw new Error("Email ou Mot de passe incorrecte ");
     }
     // verification du password
     const isPasswordValid = await bcrypt.compare(password, user.password);

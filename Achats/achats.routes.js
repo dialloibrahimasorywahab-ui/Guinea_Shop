@@ -65,7 +65,7 @@ router.get("/:id", verifyAccessToken, authorize('admin', 'gestionnaire'), AchatC
  * @swagger
  * /achats:
  *   post:
- *     summary: Enregistrer une commande / réception d'achat (Incrémente le stock et consigne une dépense Finances)
+ *     summary: "Enregistrer une commande / réception d'achat (Incrémente le stock et consigne une dépense Finances)"
  *     tags: [Achats]
  *     security:
  *       - bearerAuth: []

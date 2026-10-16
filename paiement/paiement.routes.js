@@ -86,8 +86,8 @@ router.get("/:id", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissi
  * @swagger
  * /paiements:
  *   post:
- *     summary: Enregistrer un paiement (Génère directement et atomiquement une écriture dans Finances)
- *     description: Enregistre le paiement, met à jour le solde de la vente, synchronise la facture et insère une recette dans Finances de façon 100% ACID.
+ *     summary: "Enregistrer un paiement (Génère directement et atomiquement une écriture dans Finances)"
+ *     description: "Enregistre le paiement, met à jour le solde de la vente, synchronise la facture et insère une recette dans Finances de façon 100% ACID."
  *     tags: [Paiements]
  *     security:
  *       - bearerAuth: []

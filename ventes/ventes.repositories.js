@@ -1,4 +1,6 @@
 import venteModel from "./models/ventes.models.js";
+import "../clients/models/clients.models.js";
+import "../users/models/users.models.js";
 
 class VenteRepository {
   static createVente = async (data, session = null) => {

@@ -1,4 +1,6 @@
 import articleModel from "./models/articles.models.js";
+import "../fournisseur/models/fournisseur.models.js";
+import "../categories/models/categories.models.js";
 
 class ArticleRepository {
   static createArticle = async (data, session = null) => {

@@ -1,4 +1,6 @@
 import factureModel from "./models/factures.models.js";
+import "../ventes/models/ventes.models.js";
+import "../clients/models/clients.models.js";
 
 class FactureRepository {
   static createFacture = async (data, session = null) => {

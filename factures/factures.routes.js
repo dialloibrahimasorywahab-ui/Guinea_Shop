@@ -114,8 +114,8 @@ router.post(
  * @swagger
  * /factures/{id}/payer:
  *   post:
- *     summary: Enregistrer un paiement direct sur une facture (Action atomique Finances)
- *     description: Crée le paiement, réconcilie le solde de la facture et insère directement une recette dans Finances de manière atomique.
+ *     summary: "Enregistrer un paiement direct sur une facture (Action atomique Finances)"
+ *     description: "Crée le paiement, réconcilie le solde de la facture et insère directement une recette dans Finances de manière atomique."
  *     tags: [Factures]
  *     security:
  *       - bearerAuth: []

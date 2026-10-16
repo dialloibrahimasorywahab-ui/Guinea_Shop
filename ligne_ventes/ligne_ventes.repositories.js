@@ -1,4 +1,6 @@
 import ligneVenteModel from "./models/ligne_ventes.models.js";
+import "../ventes/models/ventes.models.js";
+import "../articles/models/articles.models.js";
 
 class LigneVenteRepository {
   static createLigneVente = async (data, session = null) => {

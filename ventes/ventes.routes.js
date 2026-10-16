@@ -85,7 +85,7 @@ router.get("/:id", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissi
  * @swagger
  * /ventes:
  *   post:
- *     summary: Créer une vente (Transaction ACID : décrémente le stock, trace les mouvements et génère la facture)
+ *     summary: "Créer une vente (Transaction ACID : décrémente le stock, trace les mouvements et génère la facture)"
  *     tags: [Ventes]
  *     security:
  *       - bearerAuth: []

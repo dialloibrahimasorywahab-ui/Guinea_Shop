@@ -11,9 +11,9 @@ const startServer = async () => {
     console.log("Tentative de connexion à MongoDB...");
     await connectDB();
 
-    // 2. Démarrer le serveur Express uniquement si la base est connectée
     const serverInstance = serveur.listen(PORT, () => {
       console.log(`🚀 Serveur opérationnel et à l'écoute sur http://localhost:${PORT}`);
+      console.log(`📚 Documentation Swagger UI disponible sur http://localhost:${PORT}/api-docs`);
     });
 
     // 3. Gestion propre de l'arrêt du serveur (Graceful Shutdown)

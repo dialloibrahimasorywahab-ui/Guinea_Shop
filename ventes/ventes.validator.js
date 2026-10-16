@@ -19,3 +19,9 @@ export const createVenteSchema = yup.object().shape({
   numeroFacture: yup.string().trim(),
   statut: yup.string().oneOf(['en_attente', 'payée', 'annulée']),
 });
+
+export const updateVenteSchema = yup.object().shape({
+  client_id: yup.string().trim(),
+  numeroFacture: yup.string().trim(),
+  statut: yup.string().oneOf(['en_attente', 'payée', 'annulée']),
+});

@@ -208,6 +208,8 @@ API RESTful complète pour la gestion commerciale et ERP **GH_Maick** :
 
 const swaggerSpec = swaggerJSDoc(options);
 
+export { swaggerSpec };
+
 export const setupSwagger = (app) => {
   // Exposition de la documentation Swagger UI
   app.use(
