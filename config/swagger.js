@@ -54,6 +54,7 @@ API RESTful complète pour la gestion commerciale et ERP **GH_Maick** :
           type: 'object',
           properties: {
             _id: { type: 'string', example: '66f0123456789abcdef01234' },
+            login: { type: 'string', example: 'admin' },
             nom: { type: 'string', example: 'Diallo' },
             prenom: { type: 'string', example: 'Ibrahima' },
             email: { type: 'string', example: 'user@ghmaick.com' },
@@ -184,7 +185,8 @@ API RESTful complète pour la gestion commerciale et ERP **GH_Maick** :
       },
     ],
     tags: [
-      { name: 'Authentification & Utilisateurs', description: 'Gestion des comptes et authentification JWT' },
+      { name: 'Authentification', description: 'Connexion (Login), renouvellement de token (Refresh Token) et profil connecté' },
+      { name: 'Utilisateurs', description: 'Gestion des comptes et des rôles RBAC' },
       { name: 'Articles', description: 'Catalogue des produits et gestion des prix' },
       { name: 'Catégories', description: 'Classification des articles' },
       { name: 'Clients', description: 'Répertoire et historique des clients' },

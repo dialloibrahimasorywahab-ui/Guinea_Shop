@@ -97,7 +97,7 @@ router.get("/:id", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissi
  *             type: object
  *             required: [venteId]
  *             properties:
- *               venteId: { type: string, example: "66f0123456789abcdef01237" }
+ *               venteId: { type: string, example: "" }
  *     responses:
  *       201:
  *         description: Facture générée
@@ -133,9 +133,9 @@ router.post(
  *             type: object
  *             required: [montant, modePaiement]
  *             properties:
- *               montant: { type: number, example: 1000000 }
- *               modePaiement: { type: string, enum: [espèces, carte, chèque, virement, mobile_money, autre], example: "mobile_money" }
- *               description: { type: string, example: "Règlement partiel facture" }
+ *               montant: { type: number, example: 0 }
+ *               modePaiement: { type: string, enum: [espèces, carte, chèque, virement, mobile_money, autre], example: "espèces" }
+ *               description: { type: string, example: "" }
  *     responses:
  *       200:
  *         description: Paiement enregistré avec succès et synchronisé dans Finances

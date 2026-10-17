@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
+import authRoutes from './auth/auth.routes.js';
 import usersRoutes from './users/users.routes.js';
 import categoriesRoutes from './categories/categories.routes.js';
 import clientsRoutes from './clients/clients.routes.js';
@@ -28,16 +29,16 @@ const serveur = express();
 
 // Middlewares de sécurité et de réseau
 serveur.use(
-  helmet({
-    contentSecurityPolicy: false,
-  })
+    helmet({
+        contentSecurityPolicy: false,
+    })
 );
 serveur.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
+    cors({
+        origin: process.env.CORS_ORIGIN || '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    })
 );
 
 // Configuration de la documentation Swagger (/api-docs et /api-docs.json)
@@ -49,14 +50,15 @@ serveur.use(express.urlencoded({ extended: true }));
 
 // Endpoint de santé de l'API
 serveur.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "API GH_Maick opérationnelle",
-    timestamp: new Date().toISOString(),
-  });
+    res.status(200).json({
+        success: true,
+        message: "API GH_Maick opérationnelle",
+        timestamp: new Date().toISOString(),
+    });
 });
 
 // Exposition des différentes routes métier de l'application
+serveur.use('/auth', authRoutes);
 serveur.use('/users', usersRoutes);
 serveur.use('/categories', categoriesRoutes);
 serveur.use('/clients', clientsRoutes);
@@ -76,19 +78,19 @@ serveur.use('/finances', financesRoutes);
 
 // Gestionnaire 404 pour les routes non reconnues
 serveur.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Ressource introuvable : ${req.method} ${req.originalUrl}`,
-  });
+    res.status(404).json({
+        success: false,
+        message: `Ressource introuvable : ${req.method} ${req.originalUrl}`,
+    });
 });
 
 // Middleware global de traitement des erreurs inattendues
 serveur.use((err, req, res, next) => {
-  console.error("Erreur serveur non interceptée :", err);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Une erreur interne est survenue sur le serveur",
-  });
+    console.error("Erreur serveur non interceptée :", err);
+    res.status(err.status || 500).json({
+        success: false,
+        message: err.message || "Une erreur interne est survenue sur le serveur",
+    });
 });
 
 export default serveur;

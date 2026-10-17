@@ -137,11 +137,12 @@ router.get("/:id", verifyAccessToken, ArticleController.getArticleById);
  *             type: object
  *             required: [libelle, prixUnitaire, categorie_id]
  *             properties:
- *               libelle: { type: string, example: "Imprimante Laser HP" }
- *               prixUnitaire: { type: number, example: 1800000 }
- *               quantiteEnStock: { type: number, example: 10 }
- *               seuilAlerte: { type: number, example: 2 }
- *               categorie_id: { type: string, example: "66f0123456789abcdef01236" }
+ *               libelle: { type: string, example: "" }
+ *               prixUnitaire: { type: number, example: 0 }
+ *               quantiteEnStock: { type: number, example: 0 }
+ *               seuilAlerte: { type: number, example: 5 }
+ *               categorie_id: { type: string, example: "" }
+ *               fournisseur_id: { type: string, example: "" }
  *     responses:
  *       201:
  *         description: Article créé avec succès

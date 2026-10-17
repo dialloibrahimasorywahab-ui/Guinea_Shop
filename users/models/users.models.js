@@ -3,6 +3,13 @@ import crypto from 'crypto';
 
 const userSchema = new Schema(
   {
+    login: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      lowercase: true,
+    },
     nom: {
       type: String,
       required: [true, 'Le nom est requis'],

@@ -50,6 +50,7 @@ const seedDatabase = async () => {
 
     const users = await userModel.insertMany([
       {
+        login: "admin",
         nom: "Diallo",
         prenom: "Ibrahima Sory",
         email: "admin@ghmaick.com",
@@ -58,6 +59,7 @@ const seedDatabase = async () => {
         password: defaultPassword,
       },
       {
+        login: "gestionnaire",
         nom: "Bah",
         prenom: "Mamadou",
         email: "gestionnaire@ghmaick.com",
@@ -66,6 +68,7 @@ const seedDatabase = async () => {
         password: defaultPassword,
       },
       {
+        login: "caissier",
         nom: "Camara",
         prenom: "Fatoumata",
         email: "caissier@ghmaick.com",
@@ -74,6 +77,7 @@ const seedDatabase = async () => {
         password: defaultPassword,
       },
       {
+        login: "client",
         nom: "Sow",
         prenom: "Alpha",
         email: "client@ghmaick.com",

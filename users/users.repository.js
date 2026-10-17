@@ -18,7 +18,18 @@ class UserRepository {
   };
 
   static getUserByEmail = async (email, withPassword = false) => {
-    const query = userModel.findOne({ email });
+    const query = userModel.findOne({ email: email?.toLowerCase() });
+    if (withPassword) {
+      query.select('+password');
+    }
+    return await query;
+  };
+
+  static getUserByLoginOrEmail = async (identifier, withPassword = false) => {
+    const cleaned = identifier?.trim().toLowerCase();
+    const query = userModel.findOne({
+      $or: [{ email: cleaned }, { login: cleaned }],
+    });
     if (withPassword) {
       query.select('+password');
     }

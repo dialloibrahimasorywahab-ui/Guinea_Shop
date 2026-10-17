@@ -1,6 +1,10 @@
 import * as yup from 'yup';
 
 export const createUserSchema = yup.object().shape({
+  login: yup
+    .string()
+    .trim()
+    .min(3, "Le login doit comporter au moins 3 caractères"),
   nom: yup.string().trim().required("Le nom est obligatoire"),
   prenom: yup.string().trim().required("Le prénom est obligatoire"),
   email: yup
@@ -19,16 +23,8 @@ export const createUserSchema = yup.object().shape({
     .default('client'),
 });
 
-export const loginSchema = yup.object().shape({
-  email: yup
-    .string()
-    .trim()
-    .email("Format d'email invalide")
-    .required("L'email est obligatoire"),
-  password: yup.string().required("Le mot de passe est obligatoire"),
-});
-
 export const updateUserSchema = yup.object().shape({
+  login: yup.string().trim().min(3, "Le login doit comporter au moins 3 caractères"),
   nom: yup.string().trim(),
   prenom: yup.string().trim(),
   email: yup.string().trim().email("Format d'email invalide"),

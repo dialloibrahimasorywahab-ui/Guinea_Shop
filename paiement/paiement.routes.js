@@ -99,12 +99,12 @@ router.get("/:id", verifyAccessToken, authorize('admin', 'gestionnaire', 'caissi
  *             type: object
  *             required: [montant, modePaiement]
  *             properties:
- *               vente_id: { type: string, example: "66f0123456789abcdef01237" }
- *               facture_id: { type: string, example: "66f0123456789abcdef01239" }
- *               montant: { type: number, example: 500000 }
+ *               vente_id: { type: string, example: "" }
+ *               facture_id: { type: string, example: "" }
+ *               montant: { type: number, example: 0 }
  *               modePaiement: { type: string, enum: [espèces, carte, chèque, virement, mobile_money, autre], example: "espèces" }
  *               statut: { type: string, enum: [validé, en_attente], example: "validé" }
- *               description: { type: string, example: "Acompte sur commande" }
+ *               description: { type: string, example: "" }
  *     responses:
  *       201:
  *         description: Paiement enregistré et synchronisé avec Factures et Finances
