@@ -6,7 +6,8 @@ const verifyAccessToken = (req, res, next) => {
         return res.status(401).json({ message: "Access token est obligatoire" });
     }
 
-    const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
+    // Nettoyer les préfixes "Bearer " (même si répétés dans Swagger UI) et espaces
+    const token = authHeader.replace(/^(Bearer\s+)+/i, '').trim();
     if (!token) {
         return res.status(401).json({ message: "Token manquant ou mal formaté" });
     }
