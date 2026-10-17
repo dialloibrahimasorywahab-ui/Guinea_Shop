@@ -1,64 +1,79 @@
-import mongoose from "mongoose";
 import AchatRepository from "./achats.repositories.js";
 import LigneAchatRepository from "../Ligne_achat/ligne_achat.repositories.js";
 import ArticleRepository from "../articles/articles.repositories.js";
 import MouvementStockRepository from "../Mouvement_stock/mouvement_stock.repositories.js";
 import FinanceRepository from "../Finances/finances.repositories.js";
+import FournisseurRepository from "../fournisseur/fournisseur.repositories.js";
+import runInTransaction from "../common/db/transaction.js";
+import nextNumber from "../common/utils/counter.js";
 
 class AchatService {
   /**
    * Création d'un achat fournisseur avec transaction ACID,
-   * mise à jour automatique des stocks, traçabilité MouvementStock et impact Finance si payé
+   * mise à jour atomique des stocks et traçabilité MouvementStock
    */
   static createAchat = async (data) => {
-    const { fournisseur_id, user_id, items, numeroAchat, statut, statutPaiement } = data;
+    return await runInTransaction(async (session) => {
+      const { fournisseur_id, user_id, items, statut, statutPaiement } = data;
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      throw new Error("Un achat doit contenir au moins un article");
-    }
-
-    const purchaseNum =
-      numeroAchat || `ACH-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    const session = await mongoose.startSession();
-    let isTransactionActive = false;
-
-    try {
-      try {
-        session.startTransaction();
-        isTransactionActive = true;
-      } catch (e) {
-        isTransactionActive = false;
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        throw new Error("Un achat doit contenir au moins un article");
       }
 
-      const sessionOption = isTransactionActive ? session : null;
-
-      let montantTotal = 0;
-      const linesToPrepare = [];
-
-      // 1. Valider les articles et calculer le montant total
-      for (const item of items) {
-        const article = await ArticleRepository.getArticleById(item.article_id, sessionOption);
-        if (!article) {
-          throw new Error(`Article ID ${item.article_id} introuvable`);
+      // 1. Vérification du fournisseur
+      if (fournisseur_id) {
+        const fournisseur = await FournisseurRepository.getFournisseurById(fournisseur_id);
+        if (!fournisseur) {
+          throw new Error(`Fournisseur ID ${fournisseur_id} introuvable`);
         }
+      }
 
-        const sousTotal = Number(item.quantite) * Number(item.prixAchatUnitaire);
-        montantTotal += sousTotal;
-
-        linesToPrepare.push({
-          article,
-          article_id: item.article_id,
-          quantite: Number(item.quantite),
-          prixAchatUnitaire: Number(item.prixAchatUnitaire),
-          sousTotal,
+      // 2. Regroupement par article (évite les doublons)
+      const articlesMap = new Map();
+      for (const item of items) {
+        if (!item.article_id || !item.quantite || Number(item.quantite) <= 0) {
+          throw new Error("Chaque ligne d'achat doit avoir un article_id valide et une quantité positive");
+        }
+        const key = String(item.article_id);
+        const existing = articlesMap.get(key) || { quantite: 0, prixAchatUnitaire: Number(item.prixAchatUnitaire || 0) };
+        articlesMap.set(key, {
+          quantite: existing.quantite + Math.floor(Number(item.quantite)),
+          prixAchatUnitaire: Number(item.prixAchatUnitaire || existing.prixAchatUnitaire),
         });
       }
 
-      // 2. Création de l'entête d'achat
+      // 3. Validation des articles et calcul du montant total
+      let montantTotal = 0;
+      const linesToPrepare = [];
+
+      for (const [articleId, info] of articlesMap.entries()) {
+        const article = await ArticleRepository.getArticleById(articleId, session);
+        if (!article) {
+          throw new Error(`Article ID ${articleId} introuvable`);
+        }
+
+        const sousTotal = info.quantite * info.prixAchatUnitaire;
+        montantTotal += sousTotal;
+
+        linesToPrepare.push({
+          article_id: article._id,
+          libelle: article.libelle,
+          quantite: info.quantite,
+          prixAchatUnitaire: info.prixAchatUnitaire,
+          sousTotal,
+          quantiteAvant: article.quantiteEnStock,
+        });
+      }
+
+      // 4. Numéro séquentiel garanti
+      const year = new Date().getFullYear();
+      const seq = await nextNumber(`achat-${year}`, session);
+      const purchaseNum = `ACH-${year}-${String(seq).padStart(6, '0')}`;
+
       const currentStatut = statut || 'reçu';
       const currentStatutPaiement = statutPaiement || 'impayé';
 
+      // 5. Création de l'entête d'achat
       const newAchat = await AchatRepository.createAchat(
         {
           numeroAchat: purchaseNum,
@@ -68,33 +83,34 @@ class AchatService {
           statut: currentStatut,
           statutPaiement: currentStatutPaiement,
         },
-        sessionOption
+        session
       );
 
-      // 3. Traitement des lignes d'achat et mouvement de stock (entrée)
+      // 6. Traitement des lignes d'achat et mouvement de stock
       const createdLines = [];
       for (const line of linesToPrepare) {
-        // Si l'achat est réceptionné, incrémenter le stock de l'article
-        if (currentStatut === 'reçu') {
-          line.article.quantiteEnStock += line.quantite;
-          await line.article.save(sessionOption ? { session: sessionOption } : undefined);
+        let quantiteApres = line.quantiteAvant;
 
-          // Traçabilité : Enregistrement du mouvement de stock ENTRÉE
+        if (currentStatut === 'reçu') {
+          const updated = await ArticleRepository.incrementStock(line.article_id, line.quantite, session);
+          quantiteApres = updated ? updated.quantiteEnStock : line.quantiteAvant + line.quantite;
+
           await MouvementStockRepository.createMouvement(
             {
               article_id: line.article_id,
               user_id,
               typeMouvement: 'entrée',
               quantite: line.quantite,
+              quantiteAvant: line.quantiteAvant,
+              quantiteApres,
               motif: `Approvisionnement Achat N° ${purchaseNum}`,
               achat_id: newAchat._id,
               dateMouvement: new Date(),
             },
-            sessionOption
+            session
           );
         }
 
-        // Création de la ligne d'achat
         const createdLine = await LigneAchatRepository.createLigneAchat(
           {
             achat_id: newAchat._id,
@@ -103,46 +119,96 @@ class AchatService {
             prixAchatUnitaire: line.prixAchatUnitaire,
             sousTotal: line.sousTotal,
           },
-          sessionOption
+          session
         );
-
         createdLines.push(createdLine);
       }
 
-      // 4. Si l'achat est payé immédiatement, enregistrement dans le grand livre Finances (dépense)
+      // 7. Si statutPaiement est 'payé', enregistrer la dépense correspondante dans Finances
       if (currentStatutPaiement === 'payé') {
         await FinanceRepository.createTransaction(
           {
             type: 'dépense',
             categorie: 'achat',
             montant: montantTotal,
-            description: `Paiement direct Achat N° ${purchaseNum}`,
+            modePaiement: 'virement',
+            description: `Règlement Achat N° ${purchaseNum}`,
             user_id,
             achat_id: newAchat._id,
-            modePaiement: 'espèces',
             dateTransaction: new Date(),
           },
-          sessionOption
+          session
         );
       }
 
-      if (isTransactionActive) {
-        await session.commitTransaction();
-      }
-
-      const fullAchat = await AchatRepository.getAchatById(newAchat._id);
+      const fullAchat = await AchatRepository.getAchatById(newAchat._id, session);
       return {
         achat: fullAchat,
         lignesAchat: createdLines,
       };
-    } catch (error) {
-      if (isTransactionActive) {
-        await session.abortTransaction();
+    });
+  };
+
+  /**
+   * Annulation propre d'un achat :
+   * Décrémente le stock sans écrêtage masqué
+   */
+  static annulerAchat = async (id, operatorUserId = null) => {
+    return await runInTransaction(async (session) => {
+      const achat = await AchatRepository.getAchatById(id, session);
+      if (!achat) {
+        throw new Error(`Achat ID ${id} introuvable`);
       }
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+
+      if (achat.statut === 'annulé') {
+        throw new Error("Cet achat est déjà annulé");
+      }
+
+      const lignes = await LigneAchatRepository.getLignesByAchatId(id, session);
+
+      // Si les articles avaient été reçus en stock, déduire les quantités de façon stricte
+      if (achat.statut === 'reçu') {
+        for (const ligne of lignes) {
+          const articleId = ligne.article_id?._id || ligne.article_id;
+          const article = await ArticleRepository.getArticleById(articleId, session);
+          if (!article) {
+            throw new Error(`Article ID ${articleId} introuvable`);
+          }
+
+          if (article.quantiteEnStock < ligne.quantite) {
+            throw new Error(
+              `Impossible d'annuler l'achat : une partie du stock de "${article.libelle}" a déjà été vendue (Stock actuel: ${article.quantiteEnStock}, Quantité de l'achat: ${ligne.quantite})`
+            );
+          }
+
+          const quantiteAvant = article.quantiteEnStock;
+          const updated = await ArticleRepository.decrementStock(articleId, ligne.quantite, session);
+
+          await MouvementStockRepository.createMouvement(
+            {
+              article_id: article._id,
+              user_id: operatorUserId || achat.user_id,
+              typeMouvement: 'sortie',
+              quantite: ligne.quantite,
+              quantiteAvant,
+              quantiteApres: updated.quantiteEnStock,
+              motif: `Annulation Achat N° ${achat.numeroAchat}`,
+              achat_id: achat._id,
+              dateMouvement: new Date(),
+            },
+            session
+          );
+        }
+      }
+
+      // Mettre à jour le statut
+      const updatedAchat = await AchatRepository.updateAchat(id, { statut: 'annulé' }, session);
+
+      return {
+        achat: updatedAchat,
+        message: "Achat annulé avec succès et stocks ajustés",
+      };
+    });
   };
 
   static getAchatById = async (id) => {
@@ -167,40 +233,8 @@ class AchatService {
     return await AchatRepository.updateAchat(id, update);
   };
 
-  /**
-   * Annulation d'un achat :
-   * Décrémente le stock réintégré et enregistre le mouvement de stock compensatoire
-   */
   static deleteAchat = async (id, operatorUserId = null) => {
-    const achat = await AchatRepository.getAchatById(id);
-    if (!achat) return null;
-
-    const lignes = await LigneAchatRepository.getLignesByAchatId(id);
-
-    // Si les articles avaient été reçus en stock, déduire les quantités
-    if (achat.statut === 'reçu') {
-      for (const ligne of lignes) {
-        const articleId = ligne.article_id?._id || ligne.article_id;
-        const article = await ArticleRepository.getArticleById(articleId);
-        if (article) {
-          article.quantiteEnStock = Math.max(0, article.quantiteEnStock - ligne.quantite);
-          await article.save();
-
-          await MouvementStockRepository.createMouvement({
-            article_id: article._id,
-            user_id: operatorUserId || achat.user_id,
-            typeMouvement: 'sortie',
-            quantite: ligne.quantite,
-            motif: `Annulation Achat N° ${achat.numeroAchat}`,
-            achat_id: achat._id,
-            dateMouvement: new Date(),
-          });
-        }
-      }
-    }
-
-    await LigneAchatRepository.deleteLignesByAchatId(id);
-    return await AchatRepository.deleteAchat(id);
+    return await this.annulerAchat(id, operatorUserId);
   };
 
   static deleteAchatById = async (id, operatorUserId = null) => {

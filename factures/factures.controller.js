@@ -22,7 +22,7 @@ class FactureController {
     try {
       const payload = {
         ...req.body,
-        user_id: req.body.user_id || req.user?.id,
+        user_id: req.user.id,
       };
       const result = await FactureService.payerFacture(req.params.id, payload);
       return res.status(200).json({

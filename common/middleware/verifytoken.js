@@ -1,24 +1,28 @@
 import JwtUtils from "../utils/jwt.utils.js";
 
 const verifyAccessToken = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ message: "Access token est obligatoire" });
-    }
+  const header = req.headers.authorization || '';
+  // Tolère les préfixes Bearer répétés ou simples et les espaces
+  const token = header.replace(/^(Bearer\s+)+/i, '').trim();
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      code: 'TOKEN_MISSING',
+      message: 'Access token obligatoire',
+    });
+  }
 
-    // Nettoyer les préfixes "Bearer " (même si répétés dans Swagger UI) et espaces
-    const token = authHeader.replace(/^(Bearer\s+)+/i, '').trim();
-    if (!token) {
-        return res.status(401).json({ message: "Token manquant ou mal formaté" });
-    }
-
-    try {
-        const decoded = JwtUtils.verifyAccessToken(token);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(403).json({ message: "Token d'accès invalide ou expiré" });
-    }
+  try {
+    req.user = JwtUtils.verifyAccessToken(token);
+    return next();
+  } catch (err) {
+    const expired = err.name === 'TokenExpiredError';
+    return res.status(401).json({
+      success: false,
+      code: expired ? 'TOKEN_EXPIRED' : 'TOKEN_INVALID',
+      message: expired ? 'Token expiré' : 'Token invalide',
+    });
+  }
 };
 
 export default verifyAccessToken;

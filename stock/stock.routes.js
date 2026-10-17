@@ -9,9 +9,18 @@ const router = express.Router();
 
 /**
  * @swagger
- * /stock/etat:
+ * /stock:
  *   get:
  *     summary: Synthèse et valorisation globale du stock
+ *     tags: [Stock & Mouvements]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: État et valeur financière totale du stock
+ * /stock/etat:
+ *   get:
+ *     summary: Synthèse et valorisation globale du stock (alias)
  *     tags: [Stock & Mouvements]
  *     security:
  *       - bearerAuth: []

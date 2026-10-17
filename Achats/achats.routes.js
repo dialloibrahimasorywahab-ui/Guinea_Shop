@@ -141,6 +141,7 @@ router.put(
   validate(updateAchatSchema),
   AchatController.updateAchat
 );
+router.post("/:id/annuler", verifyAccessToken, authorize('admin'), AchatController.deleteAchat);
 router.delete("/:id", verifyAccessToken, authorize('admin'), AchatController.deleteAchat);
 
 export default router;

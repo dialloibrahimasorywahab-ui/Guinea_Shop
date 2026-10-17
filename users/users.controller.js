@@ -27,6 +27,18 @@ class UserController {
   static getUserById = async (req, res) => {
     try {
       const { id } = req.params;
+
+      // Un utilisateur ne peut consulter que son propre profil, sauf s'il est admin ou gestionnaire
+      const isPrivileged = req.user && ['admin', 'gestionnaire'].includes(req.user.role);
+      const isSelf = req.user && String(req.user.id) === String(id);
+
+      if (!isPrivileged && !isSelf) {
+        return res.status(403).json({
+          success: false,
+          message: "Accès refusé : vous n'êtes pas autorisé à consulter ce profil",
+        });
+      }
+
       const user = await UserService.getUserById(id);
       if (!user) {
         return res.status(404).json({ success: false, message: "Utilisateur introuvable" });

@@ -37,6 +37,26 @@ const articleSchema = new Schema(
       default: 5,
       min: [0, "Le seuil d'alerte ne peut pas être négatif"],
     },
+    image: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    taille: {
+      type: String,
+      default: 'Standard',
+      trim: true,
+    },
+    couleur: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    marque: {
+      type: String,
+      default: 'GH_Maick Men',
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

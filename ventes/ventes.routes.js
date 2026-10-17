@@ -158,6 +158,34 @@ router.put(
   validate(updateVenteSchema),
   VenteController.updateVente
 );
+
+/**
+ * @swagger
+ * /ventes/{id}/annuler:
+ *   post:
+ *     summary: Annuler une vente (Restitue automatiquement le stock et trace le mouvement)
+ *     tags: [Ventes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Vente annulée avec succès et stocks réintégrés
+ *       400:
+ *         description: Erreur lors de l'annulation ou vente déjà annulée
+ */
+router.post(
+  "/:id/annuler",
+  verifyAccessToken,
+  authorize('admin', 'gestionnaire'),
+  VenteController.annulerVente
+);
+
 router.delete("/:id", verifyAccessToken, authorize('admin'), VenteController.deleteVente);
 
 export default router;

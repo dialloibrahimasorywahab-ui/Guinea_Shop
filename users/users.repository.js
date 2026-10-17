@@ -26,7 +26,8 @@ class UserRepository {
   };
 
   static getUserByLoginOrEmail = async (identifier, withPassword = false) => {
-    const cleaned = identifier?.trim().toLowerCase();
+    const raw = typeof identifier === 'object' && identifier !== null ? (identifier.login || identifier.email) : identifier;
+    const cleaned = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
     const query = userModel.findOne({
       $or: [{ email: cleaned }, { login: cleaned }],
     });

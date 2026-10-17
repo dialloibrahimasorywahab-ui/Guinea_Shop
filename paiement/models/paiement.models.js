@@ -1,4 +1,5 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
+import { MODES_PAIEMENT, STATUTS_PAIEMENT } from '../../common/constants.js';
 
 const paiementSchema = new Schema(
   {
@@ -10,7 +11,7 @@ const paiementSchema = new Schema(
     modePaiement: {
       type: String,
       enum: {
-        values: ['espèces', 'espèce', 'carte', 'chèque', 'virement', 'mobile_money', 'Mobile Money', 'autre'],
+        values: MODES_PAIEMENT,
         message: 'Mode de paiement non valide',
       },
       required: [true, 'Le mode de paiement est requis'],
@@ -27,7 +28,10 @@ const paiementSchema = new Schema(
     },
     statut: {
       type: String,
-      enum: ['validé', 'valide', 'échoué', 'echoue', 'en_attente', 'credit'],
+      enum: {
+        values: STATUTS_PAIEMENT,
+        message: 'Statut de paiement non valide',
+      },
       default: 'validé',
     },
   },

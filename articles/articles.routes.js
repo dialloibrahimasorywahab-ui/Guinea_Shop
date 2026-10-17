@@ -2,6 +2,8 @@ import express from "express";
 import ArticleController from "./articles.controller.js";
 import verifyAccessToken from "../common/middleware/verifytoken.js";
 import authorize from "../common/middleware/authorize.js";
+import validate from "../common/validator/validator.js";
+import { createArticleSchema, updateArticleSchema } from "./articles.validator.js";
 
 const router = express.Router();
 
@@ -138,17 +140,34 @@ router.get("/:id", verifyAccessToken, ArticleController.getArticleById);
  *             required: [libelle, prixUnitaire, categorie_id]
  *             properties:
  *               libelle: { type: string, example: "" }
+ *               description: { type: string, example: "" }
  *               prixUnitaire: { type: number, example: 0 }
  *               quantiteEnStock: { type: number, example: 0 }
  *               seuilAlerte: { type: number, example: 5 }
+ *               image: { type: string, description: "URL de l'image (ex: /uploads/costume.webp)", example: "" }
+ *               taille: { type: string, example: "" }
+ *               couleur: { type: string, example: "" }
+ *               marque: { type: string, example: "" }
  *               categorie_id: { type: string, example: "" }
  *               fournisseur_id: { type: string, example: "" }
  *     responses:
  *       201:
  *         description: Article créé avec succès
  */
-router.post("/", verifyAccessToken, authorize('admin', 'gestionnaire'), ArticleController.createArticle);
-router.put("/:id", verifyAccessToken, authorize('admin', 'gestionnaire'), ArticleController.updateArticle);
+router.post(
+  "/",
+  verifyAccessToken,
+  authorize('admin', 'gestionnaire'),
+  validate(createArticleSchema),
+  ArticleController.createArticle
+);
+router.put(
+  "/:id",
+  verifyAccessToken,
+  authorize('admin', 'gestionnaire'),
+  validate(updateArticleSchema),
+  ArticleController.updateArticle
+);
 router.delete("/:id", verifyAccessToken, authorize('admin'), ArticleController.deleteArticle);
 
 export default router;

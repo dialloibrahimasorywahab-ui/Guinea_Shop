@@ -15,7 +15,7 @@ class StockService {
     const stockDetails = articles.map((art) => {
       const qte = art.quantiteEnStock || 0;
       const pu = art.prixUnitaire || 0;
-      const seuil = art.seuilAlerte || 5;
+      const seuil = art.seuilAlerte ?? 5;
       const valeur = qte * pu;
       const enAlerte = qte <= seuil;
 
@@ -70,7 +70,7 @@ class StockService {
     }
 
     const qte = article.quantiteEnStock || 0;
-    const seuil = article.seuilAlerte || 5;
+    const seuil = article.seuilAlerte ?? 5;
 
     return {
       article_id: article._id,

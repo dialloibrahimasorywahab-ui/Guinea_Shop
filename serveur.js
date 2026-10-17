@@ -2,11 +2,15 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import serveur from './app.js';
 import connectDB from './config/db/db.config.js';
+import checkEnv from './config/env.js';
 
 const PORT = process.env.PORT || 8000;
 
 const startServer = async () => {
   try {
+    // 0. Vérification stricte des variables d'environnement indispensables
+    checkEnv();
+
     // 1. Établir la connexion à MongoDB avant d'ouvrir le port HTTP
     console.log("Tentative de connexion à MongoDB...");
     await connectDB();

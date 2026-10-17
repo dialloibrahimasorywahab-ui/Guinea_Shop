@@ -11,11 +11,13 @@ export const createArticleSchema = yup.object().shape({
   quantiteEnStock: yup
     .number()
     .typeError("La quantité en stock doit être un nombre")
+    .integer("La quantité en stock doit être un entier")
     .min(0, "La quantité ne peut pas être négative")
     .default(0),
   seuilAlerte: yup
     .number()
     .typeError("Le seuil d'alerte doit être un nombre")
+    .integer("Le seuil d'alerte doit être un entier")
     .min(0, "Le seuil d'alerte ne peut pas être négatif")
     .default(5),
   categorie_id: yup.string().trim().nullable(),
@@ -29,13 +31,10 @@ export const updateArticleSchema = yup.object().shape({
     .number()
     .typeError("Le prix unitaire doit être un nombre")
     .min(0, "Le prix unitaire ne peut pas être négatif"),
-  quantiteEnStock: yup
-    .number()
-    .typeError("La quantité en stock doit être un nombre")
-    .min(0, "La quantité ne peut pas être négative"),
   seuilAlerte: yup
     .number()
     .typeError("Le seuil d'alerte doit être un nombre")
+    .integer("Le seuil d'alerte doit être un entier")
     .min(0, "Le seuil d'alerte ne peut pas être négatif"),
   categorie_id: yup.string().trim().nullable(),
   fournisseur_id: yup.string().trim().nullable(),

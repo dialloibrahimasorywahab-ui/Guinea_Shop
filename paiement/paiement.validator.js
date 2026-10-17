@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { MODES_PAIEMENT, STATUTS_PAIEMENT } from '../common/constants.js';
 
 export const createPaiementSchema = yup.object().shape({
   vente_id: yup.string().trim(),
@@ -10,14 +11,11 @@ export const createPaiementSchema = yup.object().shape({
     .required("Le montant est obligatoire"),
   modePaiement: yup
     .string()
-    .oneOf(
-      ['espèces', 'espèce', 'carte', 'chèque', 'virement', 'mobile_money', 'autre'],
-      "Mode de paiement non valide"
-    )
+    .oneOf(MODES_PAIEMENT, "Mode de paiement non valide")
     .required("Le mode de paiement est obligatoire"),
   statut: yup
     .string()
-    .oneOf(['en_attente', 'validé', 'valide', 'échoué', 'echoue'])
+    .oneOf(STATUTS_PAIEMENT, "Statut de paiement non valide")
     .default('validé'),
   description: yup.string().trim(),
 }).test(
@@ -33,12 +31,9 @@ export const updatePaiementSchema = yup.object().shape({
     .positive("Le montant doit être supérieur à 0"),
   modePaiement: yup
     .string()
-    .oneOf(
-      ['espèces', 'espèce', 'carte', 'chèque', 'virement', 'mobile_money', 'autre'],
-      "Mode de paiement non valide"
-    ),
+    .oneOf(MODES_PAIEMENT, "Mode de paiement non valide"),
   statut: yup
     .string()
-    .oneOf(['en_attente', 'validé', 'valide', 'échoué', 'echoue']),
+    .oneOf(STATUTS_PAIEMENT, "Statut de paiement non valide"),
   description: yup.string().trim(),
 });

@@ -99,6 +99,20 @@ class FinanceRepository {
       }
     );
   };
+
+  static upsertByPaiementId = async (paiementId, data, session = null) => {
+    return await financeModel.findOneAndUpdate(
+      { paiement_id: paiementId },
+      { $set: data },
+      {
+        upsert: true,
+        new: true,
+        runValidators: true,
+        setDefaultsOnInsert: true,
+        ...(session ? { session } : {}),
+      }
+    );
+  };
 }
 
 export default FinanceRepository;

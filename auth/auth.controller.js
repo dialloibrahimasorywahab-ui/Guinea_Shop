@@ -65,6 +65,22 @@ class AuthController {
       return res.status(500).json({ success: false, message: error.message });
     }
   };
+
+  /**
+   * Déconnexion (révocation du refresh token)
+   */
+  static logout = async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      await AuthService.logout(refreshToken);
+      return res.status(200).json({
+        success: true,
+        message: "Déconnexion réussie (session révoquée)",
+      });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  };
 }
 
 export default AuthController;

@@ -5,13 +5,26 @@ class VenteController {
     try {
       const payload = {
         ...req.body,
-        user_id: req.body.user_id || req.user?.id,
+        user_id: req.user.id,
       };
       const result = await VenteService.createVente(payload);
       return res.status(201).json({
         success: true,
         data: result,
         message: "Vente effectuée avec succès",
+      });
+    } catch (error) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+  };
+
+  static annulerVente = async (req, res) => {
+    try {
+      const result = await VenteService.annulerVente(req.params.id, req.user.id);
+      return res.status(200).json({
+        success: true,
+        data: result,
+        message: "Vente annulée avec succès et stocks réintégrés",
       });
     } catch (error) {
       return res.status(400).json({ success: false, error: error.message });

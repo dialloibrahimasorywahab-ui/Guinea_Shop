@@ -11,10 +11,11 @@ class JwtUtils{
         });
     }
 
-    //methode pour generer un token de rafraichissement
-    static generateRefreshToken(payload) {
+    // Méthode pour générer un token de rafraîchissement
+    static generateRefreshToken(payload, options = {}) {
         return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+            expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+            ...options,
         });
     }
 

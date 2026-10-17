@@ -21,7 +21,7 @@ API RESTful complète pour la gestion commerciale et ERP **GH_Maick** :
     },
     servers: [
       {
-        url: `http://localhost:${process.env.PORT || 3000}`,
+        url: `http://localhost:${process.env.PORT || 8000}`,
         description: 'Serveur de Développement Local',
       },
     ],
@@ -70,11 +70,15 @@ API RESTful complète pour la gestion commerciale et ERP **GH_Maick** :
           type: 'object',
           properties: {
             _id: { type: 'string', example: '66f0123456789abcdef01235' },
-            codeArticle: { type: 'string', example: 'ART-1001' },
-            libelle: { type: 'string', example: 'Ordinateur Portable HP' },
-            prixUnitaire: { type: 'number', example: 4500000 },
+            libelle: { type: 'string', example: 'Costume 3 pièces Slim Fit Italien' },
+            description: { type: 'string', example: 'Laine Super 150s, coupe ajustée, doublure en satin' },
+            prixUnitaire: { type: 'number', example: 2850000 },
             quantiteEnStock: { type: 'number', example: 15 },
             seuilAlerte: { type: 'number', example: 5 },
+            image: { type: 'string', example: '/uploads/costume_bleu_nuit.webp' },
+            taille: { type: 'string', example: 'L' },
+            couleur: { type: 'string', example: 'Bleu Nuit' },
+            marque: { type: 'string', example: 'Sartoria Milano' },
             categorie_id: { type: 'string', example: '66f0123456789abcdef01236' },
           },
         },
@@ -199,6 +203,7 @@ API RESTful complète pour la gestion commerciale et ERP **GH_Maick** :
       { name: 'Lignes d\'Achat', description: 'Détails des articles achetés' },
       { name: 'Stock & Mouvements', description: 'Synthèse globale, valorisation du stock et audit des flux' },
       { name: 'Finances', description: 'Livre de trésorerie (recettes, dépenses) et bilan net' },
+      { name: 'Uploads', description: 'Téléversement de photos (vêtements, costumes, chaussures, justificatifs)' },
     ],
   },
   apis: [
@@ -220,6 +225,9 @@ export const setupSwagger = (app) => {
     swaggerUi.setup(swaggerSpec, {
       customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: 'GH_Maick API Docs',
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
     })
   );
 

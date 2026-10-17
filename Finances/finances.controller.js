@@ -5,7 +5,7 @@ class FinanceController {
     try {
       const payload = {
         ...req.body,
-        user_id: req.body.user_id || req.user?.id,
+        user_id: req.user.id,
       };
       const transaction = await FinanceService.createTransaction(payload);
       return res.status(201).json({

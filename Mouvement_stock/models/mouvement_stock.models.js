@@ -25,6 +25,14 @@ const mouvementStockSchema = new Schema(
       required: [true, 'La quantité est obligatoire'],
       min: [1, 'La quantité doit être supérieure à 0'],
     },
+    quantiteAvant: {
+      type: Number,
+      default: null,
+    },
+    quantiteApres: {
+      type: Number,
+      default: null,
+    },
     motif: {
       type: String,
       trim: true,

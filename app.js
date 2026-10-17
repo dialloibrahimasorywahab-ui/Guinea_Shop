@@ -3,7 +3,10 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
+import path from 'path';
+
 import authRoutes from './auth/auth.routes.js';
+import uploadRoutes from './upload/upload.routes.js';
 import usersRoutes from './users/users.routes.js';
 import categoriesRoutes from './categories/categories.routes.js';
 import clientsRoutes from './clients/clients.routes.js';
@@ -15,7 +18,6 @@ import facturesRoutes from './factures/factures.routes.js';
 import paiementsRoutes from './paiement/paiement.routes.js';
 import stockRoutes from './stock/stock.routes.js';
 
-
 // Nouveaux modules intégrés sans redondance
 import achatsRoutes from './Achats/achats.routes.js';
 import ligneAchatsRoutes from './Ligne_achat/ligne_achat.routes.js';
@@ -23,6 +25,7 @@ import mouvementsStockRoutes from './Mouvement_stock/mouvement_stock.routes.js';
 import financesRoutes from './Finances/finances.routes.js';
 
 import { setupSwagger } from './config/swagger.js';
+import errorHandler from './common/middleware/errorHandler.js';
 
 // Initialisation du serveur Express
 const serveur = express();
@@ -44,9 +47,9 @@ serveur.use(
 // Configuration de la documentation Swagger (/api-docs et /api-docs.json)
 setupSwagger(serveur);
 
-// Parsers JSON et URL-encoded
-serveur.use(express.json());
-serveur.use(express.urlencoded({ extended: true }));
+// Parsers JSON et URL-encoded avec restriction stricte de taille (T5.3)
+serveur.use(express.json({ limit: '100kb' }));
+serveur.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
 // Endpoint de santé de l'API
 serveur.get('/health', (req, res) => {
@@ -57,8 +60,12 @@ serveur.get('/health', (req, res) => {
     });
 });
 
+// Exposition statique du répertoire de stockage des uploads
+serveur.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // Exposition des différentes routes métier de l'application
 serveur.use('/auth', authRoutes);
+serveur.use('/uploads', uploadRoutes);
 serveur.use('/users', usersRoutes);
 serveur.use('/categories', categoriesRoutes);
 serveur.use('/clients', clientsRoutes);
@@ -84,13 +91,7 @@ serveur.use((req, res) => {
     });
 });
 
-// Middleware global de traitement des erreurs inattendues
-serveur.use((err, req, res, next) => {
-    console.error("Erreur serveur non interceptée :", err);
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message || "Une erreur interne est survenue sur le serveur",
-    });
-});
+// Middleware global de traitement unifié des erreurs (T6.5, V8)
+serveur.use(errorHandler);
 
 export default serveur;

@@ -43,6 +43,28 @@ class ArticleRepository {
   static deleteArticle = async (id, session = null) => {
     return await articleModel.findByIdAndDelete(id, session ? { session } : undefined);
   };
+
+  /**
+   * Décrémentation atomique de stock sous condition de disponibilité et article actif
+   */
+  static decrementStock = async (id, quantite, session = null) => {
+    return await articleModel.findOneAndUpdate(
+      { _id: id, isActive: true, quantiteEnStock: { $gte: quantite } },
+      { $inc: { quantiteEnStock: -quantite } },
+      { new: true, runValidators: true, ...(session ? { session } : {}) }
+    );
+  };
+
+  /**
+   * Incrémentation atomique de stock
+   */
+  static incrementStock = async (id, quantite, session = null) => {
+    return await articleModel.findByIdAndUpdate(
+      id,
+      { $inc: { quantiteEnStock: quantite } },
+      { new: true, runValidators: true, ...(session ? { session } : {}) }
+    );
+  };
 }
 
 export default ArticleRepository;

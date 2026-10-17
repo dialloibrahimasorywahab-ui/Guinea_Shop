@@ -1,4 +1,5 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
+import { MODES_PAIEMENT } from '../../common/constants.js';
 
 const financeSchema = new Schema(
   {
@@ -13,8 +14,8 @@ const financeSchema = new Schema(
     categorie: {
       type: String,
       enum: {
-        values: ['vente', 'achat', 'salaire', 'loyer', 'charge', 'autre'],
-        message: "La catégorie doit être 'vente', 'achat', 'salaire', 'loyer', 'charge' ou 'autre'",
+        values: ['vente', 'achat', 'salaire', 'loyer', 'charge', 'remboursement', 'autre'],
+        message: "La catégorie doit être 'vente', 'achat', 'salaire', 'loyer', 'charge', 'remboursement' ou 'autre'",
       },
       default: 'autre',
       required: true,
@@ -26,7 +27,10 @@ const financeSchema = new Schema(
     },
     modePaiement: {
       type: String,
-      enum: ['espèces', 'carte', 'chèque', 'virement', 'mobile_money', 'autre'],
+      enum: {
+        values: MODES_PAIEMENT,
+        message: 'Mode de paiement non valide',
+      },
       default: 'espèces',
     },
     description: {
