@@ -2,6 +2,8 @@ import UserRepository from "../users/users.repository.js";
 import JwtUtils from "../common/utils/jwt.utils.js";
 import bcrypt from "bcrypt";
 
+import userModel from "../users/models/users.models.js";
+
 class AuthService {
   /**
    * Authentification de l'utilisateur via login ou email
@@ -12,7 +14,15 @@ class AuthService {
       throw new Error("Identifiant (login/email) ou mot de passe incorrect");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    let isPasswordValid = false;
+    if (user.password && user.password.startsWith('$2')) {
+      isPasswordValid = await bcrypt.compare(password, user.password);
+    } else if (user.password && user.password.includes(':')) {
+      isPasswordValid = userModel.comparePassword(password, user.password);
+    } else {
+      isPasswordValid = await bcrypt.compare(password, user.password);
+    }
+
     if (!isPasswordValid) {
       throw new Error("Identifiant (login/email) ou mot de passe incorrect");
     }

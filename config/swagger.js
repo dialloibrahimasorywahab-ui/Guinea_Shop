@@ -31,7 +31,7 @@ API RESTful complète pour la gestion commerciale et ERP **GH_Maick** :
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Entrez votre token JWT sous la forme : Bearer <token>',
+          description: 'Entrez votre token JWT (avec ou sans préfixe Bearer)',
         },
       },
       schemas: {
