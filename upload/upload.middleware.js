@@ -10,6 +10,14 @@ if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
+// Extensions et MIME types strictement autorisés (S7 : SVG interdit pour risque XSS)
+const MIME_EXTENSIONS_MAP = {
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/png': ['.png'],
+  'image/webp': ['.webp'],
+  'application/pdf': ['.pdf'],
+};
+
 // Configuration du stockage disque avec Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -26,36 +34,30 @@ const storage = multer.diskStorage({
   },
 });
 
-// Filtre sur les types MIME autorisés (Images : jpeg, png, webp, gif, svg)
+// Filtre de sécurité renforcé (vérifie le MIME et la concordance d'extension)
 const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp',
-    'image/gif',
-    'image/svg+xml',
-    'application/pdf', // autorise également les factures/justificatifs PDF
-  ];
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowedExtensions = MIME_EXTENSIONS_MAP[file.mimetype];
 
-  if (allowedMimeTypes.includes(file.mimetype)) {
+  if (allowedExtensions && allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
     cb(
       new Error(
-        `Type de fichier non autorisé (${file.mimetype}). Types acceptés : JPG, PNG, WEBP, GIF, SVG, PDF.`
+        `Type de fichier non autorisé. Formats acceptés : JPG, PNG, WEBP, PDF (les fichiers SVG et exécutables sont strictement interdits).`
       ),
       false
     );
   }
 };
 
-// Instance Multer configurée (Taille maximale : 10 Mo par fichier)
+// Instance Multer configurée (Taille maximale : 5 Mo par fichier)
 export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10 Mo
+    fileSize: 5 * 1024 * 1024, // 5 Mo
+    files: 5, // Maximum 5 fichiers simultanés
   },
 });
 

@@ -15,7 +15,7 @@ export const createUserSchema = yup.object().shape({
   telephone: yup.string().trim().required("Le téléphone est obligatoire"),
   password: yup
     .string()
-    .min(6, "Le mot de passe doit comporter au moins 6 caractères")
+    .min(8, "Le mot de passe doit comporter au moins 8 caractères")
     .required("Le mot de passe est obligatoire"),
   role: yup
     .string()
@@ -29,7 +29,7 @@ export const updateUserSchema = yup.object().shape({
   prenom: yup.string().trim(),
   email: yup.string().trim().email("Format d'email invalide"),
   telephone: yup.string().trim(),
-  password: yup.string().min(6, "Le mot de passe doit comporter au moins 6 caractères"),
+  password: yup.string().min(8, "Le mot de passe doit comporter au moins 8 caractères"),
   role: yup.string().oneOf(['admin', 'gestionnaire', 'caissier', 'client']),
   isActive: yup.boolean(),
 });

@@ -57,7 +57,25 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // 6. Erreur interne non gérée (500)
+  // 6. Erreurs de téléversement de fichiers Multer (S7)
+  if (err.name === 'MulterError' || (err.message && err.message.includes('Type de fichier non autorisé'))) {
+    return res.status(400).json({
+      success: false,
+      message: err.message || 'Erreur lors du téléversement du fichier',
+      code: err.code || 'UPLOAD_ERROR',
+    });
+  }
+
+  // 7. Erreur de syntaxe JSON dans le corps de requête (ex: payload mal formé)
+  if ((err instanceof SyntaxError && err.status === 400 && 'body' in err) || err.type === 'entity.parse.failed') {
+    return res.status(400).json({
+      success: false,
+      message: 'Format JSON invalide dans le corps de la requête. Vérifiez les virgules, guillemets et nombres.',
+      code: 'INVALID_JSON_BODY',
+    });
+  }
+
+  // 7. Erreur interne non gérée (500)
   console.error('❌ Erreur serveur non gérée :', err);
 
   const isProd = process.env.NODE_ENV === 'production';

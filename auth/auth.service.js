@@ -64,7 +64,6 @@ class AuthService {
     return {
       accessToken,
       refreshToken,
-      token: accessToken,
       user: {
         id: user._id,
         login: user.login || user.email.split("@")[0],
@@ -149,7 +148,6 @@ class AuthService {
     return {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
-      token: newAccessToken,
     };
   };
 

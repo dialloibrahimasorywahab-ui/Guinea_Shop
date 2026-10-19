@@ -5,23 +5,30 @@ export const createArticleSchema = yup.object().shape({
   description: yup.string().trim().default(''),
   prixUnitaire: yup
     .number()
+    .transform((val, orig) => (orig === '' ? undefined : val))
     .typeError("Le prix unitaire doit être un nombre")
     .min(0, "Le prix unitaire ne peut pas être négatif")
     .required("Le prix unitaire est obligatoire"),
   quantiteEnStock: yup
     .number()
+    .transform((val, orig) => (orig === '' ? undefined : val))
     .typeError("La quantité en stock doit être un nombre")
     .integer("La quantité en stock doit être un entier")
     .min(0, "La quantité ne peut pas être négative")
     .default(0),
   seuilAlerte: yup
     .number()
+    .transform((val, orig) => (orig === '' ? undefined : val))
     .typeError("Le seuil d'alerte doit être un nombre")
     .integer("Le seuil d'alerte doit être un entier")
     .min(0, "Le seuil d'alerte ne peut pas être négatif")
     .default(5),
-  categorie_id: yup.string().trim().nullable(),
-  fournisseur_id: yup.string().trim().nullable(),
+  image: yup.string().trim().nullable(),
+  taille: yup.string().trim().nullable(),
+  couleur: yup.string().trim().nullable(),
+  marque: yup.string().trim().nullable(),
+  categorie_id: yup.string().trim().nullable().transform((v) => (v === '' ? null : v)),
+  fournisseur_id: yup.string().trim().nullable().transform((v) => (v === '' ? null : v)),
 });
 
 export const updateArticleSchema = yup.object().shape({
@@ -29,13 +36,19 @@ export const updateArticleSchema = yup.object().shape({
   description: yup.string().trim(),
   prixUnitaire: yup
     .number()
+    .transform((val, orig) => (orig === '' ? undefined : val))
     .typeError("Le prix unitaire doit être un nombre")
     .min(0, "Le prix unitaire ne peut pas être négatif"),
   seuilAlerte: yup
     .number()
+    .transform((val, orig) => (orig === '' ? undefined : val))
     .typeError("Le seuil d'alerte doit être un nombre")
     .integer("Le seuil d'alerte doit être un entier")
     .min(0, "Le seuil d'alerte ne peut pas être négatif"),
-  categorie_id: yup.string().trim().nullable(),
-  fournisseur_id: yup.string().trim().nullable(),
+  image: yup.string().trim().nullable(),
+  taille: yup.string().trim().nullable(),
+  couleur: yup.string().trim().nullable(),
+  marque: yup.string().trim().nullable(),
+  categorie_id: yup.string().trim().nullable().transform((v) => (v === '' ? null : v)),
+  fournisseur_id: yup.string().trim().nullable().transform((v) => (v === '' ? null : v)),
 });

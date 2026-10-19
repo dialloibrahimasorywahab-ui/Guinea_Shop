@@ -95,6 +95,37 @@ class ArticleController {
       return res.status(400).json({ success: false, error: error.message });
     }
   };
+
+  /**
+   * Téléverser et associer directement une image à un article existant
+   */
+  static uploadImage = async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "Aucun fichier image fourni dans le champ 'image'",
+        });
+      }
+
+      const imageUrl = `/uploads/${req.file.filename}`;
+      const updatedArticle = await ArticleService.updateArticle(req.params.id, {
+        image: imageUrl,
+      });
+
+      if (!updatedArticle) {
+        return res.status(404).json({ success: false, message: "Article introuvable" });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: updatedArticle,
+        message: "Image de l'article mise à jour avec succès",
+      });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  };
 }
 
 export default ArticleController;

@@ -64,7 +64,6 @@ const refreshLimiter = createRateLimiter({
  *                   properties:
  *                     accessToken: { type: string, example: "" }
  *                     refreshToken: { type: string, example: "" }
- *                     token: { type: string, example: "" }
  *                     user: { $ref: '#/components/schemas/User' }
  *                 message: { type: string, example: "Connexion réussie" }
  *       400:
@@ -107,7 +106,6 @@ router.post("/login", authLimiter, validate(loginSchema), AuthController.login);
  *                   properties:
  *                     accessToken: { type: string, example: "" }
  *                     refreshToken: { type: string, example: "" }
- *                     token: { type: string, example: "" }
  *                 message: { type: string, example: "Token rafraîchi avec succès" }
  *       400:
  *         description: Refresh token manquant

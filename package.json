@@ -22,12 +22,12 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.1",
     "multer": "^2.4.0",
-    "nodemon": "^1.19.4",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "nodemon": "^1.19.4",
     "supertest": "^7.3.1"
   }
 }
