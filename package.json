@@ -1,33 +1,13 @@
 {
-  "name": "gh_maick",
+  "name": "guinea-shop-monorepo",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
-  "type": "module",
-  "main": "serveur.js",
+  "private": true,
+  "description": "Monorepo Guinea Shop (Backend API ERP + Futur Frontend)",
   "scripts": {
-    "test": "node --test",
-    "check:swagger": "node scripts/check-swagger.js",
-    "start": "node serveur.js",
-    "dev": "nodemon serveur.js",
-    "seed": "node scripts/seed.js"
-  },
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "helmet": "^8.3.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.9.1",
-    "multer": "^2.4.0",
-    "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1",
-    "yup": "^1.7.1"
-  },
-  "devDependencies": {
-    "nodemon": "^1.19.4",
-    "supertest": "^7.3.1"
+    "start": "npm start --prefix backend",
+    "dev": "npm run dev --prefix backend",
+    "test": "npm test --prefix backend",
+    "check:swagger": "npm run check:swagger --prefix backend",
+    "seed": "npm run seed --prefix backend"
   }
 }
