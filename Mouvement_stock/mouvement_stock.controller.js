@@ -20,7 +20,7 @@ class MouvementStockController {
 
   static getAllMouvements = async (req, res) => {
     try {
-      const mouvements = await MouvementStockService.getAllMouvements();
+      const mouvements = await MouvementStockService.getAllMouvements(req.query);
       return res.status(200).json({ success: true, data: mouvements });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

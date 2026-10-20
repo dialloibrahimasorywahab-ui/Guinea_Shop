@@ -37,7 +37,7 @@ class FactureController {
 
   static getAllFactures = async (req, res) => {
     try {
-      const factures = await FactureService.getAllFactures();
+      const factures = await FactureService.getAllFactures(req.query);
       return res.status(200).json({ success: true, data: factures });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

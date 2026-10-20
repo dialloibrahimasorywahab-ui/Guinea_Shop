@@ -20,11 +20,7 @@ class FinanceController {
 
   static getAllTransactions = async (req, res) => {
     try {
-      const filter = {};
-      if (req.query.type) filter.type = req.query.type;
-      if (req.query.categorie) filter.categorie = req.query.categorie;
-
-      const transactions = await FinanceService.getAllTransactions(filter);
+      const transactions = await FinanceService.getAllTransactions(req.query);
       return res.status(200).json({ success: true, data: transactions });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

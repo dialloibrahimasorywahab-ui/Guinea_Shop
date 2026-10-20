@@ -111,8 +111,8 @@ class FactureService {
     return await FactureRepository.getFactureByVenteId(venteId);
   };
 
-  static getAllFactures = async () => {
-    return await FactureRepository.getAllFactures();
+  static getAllFactures = async (queryParams = {}) => {
+    return await FactureRepository.getAllFactures(queryParams);
   };
 
   static getFacturesByClient = async (clientId) => {

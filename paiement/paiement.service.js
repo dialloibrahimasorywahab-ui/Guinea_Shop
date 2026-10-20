@@ -224,8 +224,8 @@ class PaiementService {
     return await PaiementRepository.getPaiementById(id);
   };
 
-  static getAllPaiements = async () => {
-    return await PaiementRepository.getAllPaiements();
+  static getAllPaiements = async (queryParams = {}) => {
+    return await PaiementRepository.getAllPaiements(queryParams);
   };
 
   static getPaiementsByVente = async (venteId) => {

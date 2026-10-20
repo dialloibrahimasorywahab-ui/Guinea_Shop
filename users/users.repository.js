@@ -1,4 +1,5 @@
 import userModel from "./models/users.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class UserRepository {
   static createUser = async (data) => {
@@ -9,8 +10,15 @@ class UserRepository {
     return await userModel.findById(id);
   };
 
-  static getAllUsers = async () => {
-    return await userModel.find();
+  static getAllUsers = async (queryParams = {}) => {
+    const query = userModel.find();
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['nom', 'prenom', 'login', 'email', 'telephone'],
+      filterFields: ['role', 'login', 'email'],
+      allowedSortFields: ['nom', 'prenom', 'login', 'email', 'role', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { search: 'q' },
+    });
   };
 
   static getUserByRole = async (role) => {

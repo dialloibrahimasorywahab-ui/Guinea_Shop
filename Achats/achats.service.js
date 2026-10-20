@@ -221,8 +221,8 @@ class AchatService {
     };
   };
 
-  static getAllAchats = async () => {
-    return await AchatRepository.getAllAchats();
+  static getAllAchats = async (queryParams = {}) => {
+    return await AchatRepository.getAllAchats(queryParams);
   };
 
   static getAchatsByFournisseur = async (fournisseurId) => {

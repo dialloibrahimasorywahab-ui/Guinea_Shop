@@ -15,6 +15,43 @@ const router = express.Router();
  *     tags: [Paiements]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: modePaiement
+ *         schema:
+ *           type: string
+ *           enum: [espèces, orange_money, mtn_momo, virement, carte_bancaire, chèque]
+ *         description: "Filtrer par mode de paiement"
+ *       - in: query
+ *         name: statut
+ *         schema:
+ *           type: string
+ *           enum: [validé, en_attente, échoué, annulé]
+ *         description: "Filtrer par statut de paiement"
+ *       - in: query
+ *         name: vente_id
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par ID de vente"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: "Recherche par numéro de transaction, référence ou description"
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [datePaiement, montant, statut, createdAt]
+ *           default: datePaiement
+ *         description: "Champ de tri"
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
  *     responses:
  *       200:
  *         description: Liste de tous les règlements

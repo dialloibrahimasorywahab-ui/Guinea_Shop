@@ -15,6 +15,37 @@ const router = express.Router();
  *     tags: [Stock & Mouvements]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: typeMouvement
+ *         schema:
+ *           type: string
+ *           enum: [entrée, sortie, ajustement]
+ *         description: "Filtrer par type de mouvement"
+ *       - in: query
+ *         name: article_id
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par ID d'article"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: "Recherche par motif"
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [dateMouvement, quantite, typeMouvement, createdAt]
+ *           default: createdAt
+ *         description: "Champ de tri"
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
  *     responses:
  *       200:
  *         description: Liste de tous les mouvements de stock

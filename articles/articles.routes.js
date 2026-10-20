@@ -16,6 +16,51 @@ const router = express.Router();
  *     tags: [Articles]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: "Recherche textuelle par nom/libellé, description, marque ou couleur (ex: Costume, Sartoria, Bleu)"
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [libelle, prixUnitaire, quantiteEnStock, seuilAlerte, createdAt]
+ *           default: createdAt
+ *         description: "Champ sur lequel effectuer le tri"
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
+ *       - in: query
+ *         name: categorie_id
+ *         schema:
+ *           type: string
+ *         description: "Filtrer les articles par ID de catégorie"
+ *       - in: query
+ *         name: fournisseur_id
+ *         schema:
+ *           type: string
+ *         description: "Filtrer les articles par ID de fournisseur"
+ *       - in: query
+ *         name: taille
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par taille (ex: S, M, L, XL, 42)"
+ *       - in: query
+ *         name: couleur
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par couleur (ex: Bleu Nuit, Noir)"
+ *       - in: query
+ *         name: marque
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par marque"
  *     responses:
  *       200:
  *         description: Liste des articles
@@ -136,6 +181,7 @@ router.get("/categorie/:categorieId", verifyAccessToken, ArticleController.getAr
  *               libelle: { type: string, example: "Costume 3 pièces Slim Fit Italien" }
  *               description: { type: string, example: "Laine Super 150s, coupe ajustée, doublure satin" }
  *               prixUnitaire: { type: number, example: 2850000 }
+ *               quantiteEnStock: { type: number, example: 10 }
  *               seuilAlerte: { type: number, example: 5 }
  *               image:
  *                 type: string

@@ -16,7 +16,7 @@ class FournisseurController {
 
   static getAllFournisseurs = async (req, res) => {
     try {
-      const fournisseurs = await FournisseurService.getAllFournisseurs();
+      const fournisseurs = await FournisseurService.getAllFournisseurs(req.query);
       return res.status(200).json({ success: true, data: fournisseurs });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

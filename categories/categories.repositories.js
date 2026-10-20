@@ -1,4 +1,5 @@
 import categoryModel from "./models/categories.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class CategoryRepository {
   // creation d'une categorie d'article
@@ -12,8 +13,15 @@ class CategoryRepository {
   };
   
   // recuperer toutes les categories des produits dispo
-  static getAllCategories = async () => {
-    return await categoryModel.find();
+  static getAllCategories = async (queryParams = {}) => {
+    const query = categoryModel.find();
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['nom', 'description'],
+      filterFields: ['nom'],
+      allowedSortFields: ['nom', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { search: 'q' },
+    });
   };
 
   static updateCategory = async (id, update) => {

@@ -1,6 +1,7 @@
 import articleModel from "./models/articles.models.js";
 import "../fournisseur/models/fournisseur.models.js";
 import "../categories/models/categories.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class ArticleRepository {
   static createArticle = async (data, session = null) => {
@@ -14,8 +15,15 @@ class ArticleRepository {
     return await query;
   };
 
-  static getAllArticles = async () => {
-    return await articleModel.find().populate('fournisseur_id').populate('categorie_id');
+  static getAllArticles = async (queryParams = {}) => {
+    const query = articleModel.find().populate('fournisseur_id').populate('categorie_id');
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['libelle', 'description', 'marque', 'couleur', 'taille'],
+      filterFields: ['categorie_id', 'fournisseur_id', 'marque', 'couleur', 'taille', 'libelle'],
+      allowedSortFields: ['libelle', 'prixUnitaire', 'quantiteEnStock', 'seuilAlerte', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { nom: 'libelle', search: 'q' },
+    });
   };
 
   static getArticlesByFournisseur = async (fournisseurId) => {

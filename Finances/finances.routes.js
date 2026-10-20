@@ -57,6 +57,31 @@ router.get("/bilan", verifyAccessToken, authorize('admin', 'gestionnaire'), Fina
  *           type: string
  *           enum: [vente, achat, salaire, loyer, charge, autre]
  *         description: Filtrer par catégorie
+ *       - in: query
+ *         name: modePaiement
+ *         schema:
+ *           type: string
+ *           enum: [espèces, orange_money, mtn_momo, virement, carte_bancaire, chèque]
+ *         description: Filtrer par mode de paiement
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Recherche par description ou référence
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [dateTransaction, montant, type, categorie, createdAt]
+ *           default: dateTransaction
+ *         description: Champ de tri
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
  *     responses:
  *       200:
  *         description: Liste des transactions financières

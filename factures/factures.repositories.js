@@ -1,6 +1,7 @@
 import factureModel from "./models/factures.models.js";
 import "../ventes/models/ventes.models.js";
 import "../clients/models/clients.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class FactureRepository {
   static createFacture = async (data, session = null) => {
@@ -20,8 +21,15 @@ class FactureRepository {
     return await query;
   };
 
-  static getAllFactures = async () => {
-    return await factureModel.find().populate('vente_id').populate('client_id');
+  static getAllFactures = async (queryParams = {}) => {
+    const query = factureModel.find().populate('vente_id').populate('client_id');
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['numeroFacture', 'statut'],
+      filterFields: ['statut', 'client_id', 'vente_id', 'numeroFacture'],
+      allowedSortFields: ['dateFacture', 'montantTotal', 'montantPaye', 'montantRestant', 'statut', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { search: 'q', total: 'montantTotal' },
+    });
   };
 
   static getFacturesByClient = async (clientId) => {

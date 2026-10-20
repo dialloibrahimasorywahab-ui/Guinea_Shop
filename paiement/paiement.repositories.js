@@ -1,4 +1,5 @@
 import paiementModel from "./models/paiement.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class PaiementRepository {
   static createPaiement = async (data, session = null) => {
@@ -12,8 +13,15 @@ class PaiementRepository {
     return await query;
   };
 
-  static getAllPaiements = async () => {
-    return await paiementModel.find().populate('vente_id').sort({ datePaiement: -1 });
+  static getAllPaiements = async (queryParams = {}) => {
+    const query = paiementModel.find().populate('vente_id');
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['numeroTransaction', 'description', 'referenceTransaction'],
+      filterFields: ['modePaiement', 'statut', 'vente_id'],
+      allowedSortFields: ['datePaiement', 'montant', 'statut', 'createdAt'],
+      defaultSort: { datePaiement: -1 },
+      aliases: { search: 'q', mode: 'modePaiement' },
+    });
   };
 
   static getPaiementsByVente = async (venteId, session = null) => {

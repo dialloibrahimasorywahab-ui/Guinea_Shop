@@ -9,8 +9,8 @@ class ClientService {
     return await ClientRepository.getClientById(id);
   };
 
-  static getAllClients = async () => {
-    return await ClientRepository.getAllClients();
+  static getAllClients = async (queryParams = {}) => {
+    return await ClientRepository.getAllClients(queryParams);
   };
 
   static getClientByTelephone = async (telephone) => {

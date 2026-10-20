@@ -15,6 +15,37 @@ const router = express.Router();
  *     tags: [Ventes]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: statut
+ *         schema:
+ *           type: string
+ *           enum: [en_attente, payée, annulée]
+ *         description: "Filtrer par statut de vente"
+ *       - in: query
+ *         name: client_id
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par ID client"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: "Recherche par numéro de facture"
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [dateVente, montantTotal, statut, createdAt]
+ *           default: dateVente
+ *         description: "Champ de tri"
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
  *     responses:
  *       200:
  *         description: Liste de toutes les ventes

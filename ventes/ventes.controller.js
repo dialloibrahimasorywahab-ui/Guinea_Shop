@@ -33,7 +33,7 @@ class VenteController {
 
   static getAllVentes = async (req, res) => {
     try {
-      const ventes = await VenteService.getAllVentes();
+      const ventes = await VenteService.getAllVentes(req.query);
       return res.status(200).json({ success: true, data: ventes });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

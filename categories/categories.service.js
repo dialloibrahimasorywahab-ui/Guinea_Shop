@@ -9,8 +9,8 @@ class CategoryService {
     return await CategoryRepository.getCategoryById(id);
   };
 
-  static getAllCategories = async () => {
-    return await CategoryRepository.getAllCategories();
+  static getAllCategories = async (queryParams = {}) => {
+    return await CategoryRepository.getAllCategories(queryParams);
   };
 
   static updateCategory = async (id, update) => {

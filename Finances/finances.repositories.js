@@ -1,4 +1,5 @@
 import financeModel from "./models/finances.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class FinanceRepository {
   static createTransaction = async (data, session = null) => {
@@ -18,15 +19,21 @@ class FinanceRepository {
     return await query;
   };
 
-  static getAllTransactions = async (filter = {}) => {
-    return await financeModel
-      .find(filter)
+  static getAllTransactions = async (queryParams = {}) => {
+    const query = financeModel
+      .find()
       .populate('user_id')
       .populate('vente_id')
       .populate('achat_id')
       .populate('paiement_id')
-      .populate('facture_id')
-      .sort({ dateTransaction: -1 });
+      .populate('facture_id');
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['description', 'referenceTransaction'],
+      filterFields: ['type', 'categorie', 'modePaiement', 'user_id'],
+      allowedSortFields: ['dateTransaction', 'montant', 'type', 'categorie', 'createdAt'],
+      defaultSort: { dateTransaction: -1 },
+      aliases: { search: 'q', mode: 'modePaiement' },
+    });
   };
 
   static getBilanFinancier = async () => {

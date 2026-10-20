@@ -1,6 +1,7 @@
 import venteModel from "./models/ventes.models.js";
 import "../clients/models/clients.models.js";
 import "../users/models/users.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class VenteRepository {
   static createVente = async (data, session = null) => {
@@ -14,8 +15,15 @@ class VenteRepository {
     return await query;
   };
 
-  static getAllVentes = async () => {
-    return await venteModel.find().populate('client_id').populate('user_id');
+  static getAllVentes = async (queryParams = {}) => {
+    const query = venteModel.find().populate('client_id').populate('user_id');
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['numeroFacture', 'statut'],
+      filterFields: ['statut', 'client_id', 'user_id', 'numeroFacture'],
+      allowedSortFields: ['dateVente', 'montantTotal', 'statut', 'createdAt'],
+      defaultSort: { dateVente: -1 },
+      aliases: { search: 'q', date: 'dateVente', total: 'montantTotal' },
+    });
   };
 
   static getVentesByClient = async (clientId) => {

@@ -9,8 +9,8 @@ class FournisseurService {
     return await FournisseurRepository.getFournisseurById(id);
   };
 
-  static getAllFournisseurs = async () => {
-    return await FournisseurRepository.getAllFournisseurs();
+  static getAllFournisseurs = async (queryParams = {}) => {
+    return await FournisseurRepository.getAllFournisseurs(queryParams);
   };
 
   static getFournisseurByTelephone = async (telephone) => {

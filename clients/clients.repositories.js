@@ -1,4 +1,5 @@
 import clientModel from "./models/clients.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class ClientRepository {
   static createClient = async (data) => {
@@ -9,8 +10,15 @@ class ClientRepository {
     return await clientModel.findById(id);
   };
 
-  static getAllClients = async () => {
-    return await clientModel.find();
+  static getAllClients = async (queryParams = {}) => {
+    const query = clientModel.find();
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['nom', 'prenom', 'telephone', 'email', 'adresse'],
+      filterFields: ['telephone', 'email'],
+      allowedSortFields: ['nom', 'prenom', 'email', 'telephone', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { search: 'q' },
+    });
   };
 
   static getClientByTelephone = async (telephone) => {

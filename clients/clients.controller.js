@@ -16,7 +16,7 @@ class ClientController {
 
   static getAllClients = async (req, res) => {
     try {
-      const clients = await ClientService.getAllClients();
+      const clients = await ClientService.getAllClients(req.query);
       return res.status(200).json({ success: true, data: clients });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

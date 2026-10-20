@@ -16,7 +16,7 @@ class ArticleController {
 
   static getAllArticles = async (req, res) => {
     try {
-      const articles = await ArticleService.getAllArticles();
+      const articles = await ArticleService.getAllArticles(req.query);
       return res.status(200).json({ success: true, data: articles });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

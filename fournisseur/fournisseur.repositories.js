@@ -1,4 +1,5 @@
 import fournisseurModel from "./models/fournisseur.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class FournisseurRepository {
   static createFournisseur = async (data) => {
@@ -9,8 +10,15 @@ class FournisseurRepository {
     return await fournisseurModel.findById(id);
   };
 
-  static getAllFournisseurs = async () => {
-    return await fournisseurModel.find();
+  static getAllFournisseurs = async (queryParams = {}) => {
+    const query = fournisseurModel.find();
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['nom', 'contact', 'telephone', 'email', 'adresse'],
+      filterFields: ['telephone', 'email'],
+      allowedSortFields: ['nom', 'contact', 'email', 'telephone', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { search: 'q' },
+    });
   };
 
   static getFournisseurByTelephone = async (telephone) => {

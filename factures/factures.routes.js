@@ -15,6 +15,37 @@ const router = express.Router();
  *     tags: [Factures]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: statut
+ *         schema:
+ *           type: string
+ *           enum: [impayée, partiellement_payée, payée]
+ *         description: "Filtrer par statut de facture"
+ *       - in: query
+ *         name: client_id
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par ID client"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: "Recherche par numéro de facture"
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [dateFacture, montantTotal, montantPaye, montantRestant, statut, createdAt]
+ *           default: createdAt
+ *         description: "Champ de tri"
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
  *     responses:
  *       200:
  *         description: Liste des factures

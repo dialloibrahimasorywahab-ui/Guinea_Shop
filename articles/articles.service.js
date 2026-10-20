@@ -9,8 +9,8 @@ class ArticleService {
     return await ArticleRepository.getArticleById(id);
   };
 
-  static getAllArticles = async () => {
-    return await ArticleRepository.getAllArticles();
+  static getAllArticles = async (queryParams = {}) => {
+    return await ArticleRepository.getAllArticles(queryParams);
   };
 
   static getArticlesByFournisseur = async (fournisseurId) => {

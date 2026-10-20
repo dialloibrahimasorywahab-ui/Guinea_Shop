@@ -1,4 +1,5 @@
 import achatModel from "./models/achats.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class AchatRepository {
   static createAchat = async (data, session = null) => {
@@ -15,12 +16,18 @@ class AchatRepository {
     return await query;
   };
 
-  static getAllAchats = async () => {
-    return await achatModel
+  static getAllAchats = async (queryParams = {}) => {
+    const query = achatModel
       .find()
       .populate('fournisseur_id')
-      .populate('user_id')
-      .sort({ createdAt: -1 });
+      .populate('user_id');
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['numeroAchat', 'statut'],
+      filterFields: ['statut', 'fournisseur_id', 'user_id', 'numeroAchat'],
+      allowedSortFields: ['dateAchat', 'montantTotal', 'statut', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { search: 'q', total: 'montantTotal' },
+    });
   };
 
   static getAchatsByFournisseur = async (fournisseurId) => {

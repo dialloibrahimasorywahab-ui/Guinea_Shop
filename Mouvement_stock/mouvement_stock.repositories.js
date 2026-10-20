@@ -1,4 +1,5 @@
 import mouvementStockModel from "./models/mouvement_stock.models.js";
+import applyApiFeatures from "../common/utils/apiFeatures.js";
 
 class MouvementStockRepository {
   static createMouvement = async (data, session = null) => {
@@ -17,14 +18,20 @@ class MouvementStockRepository {
     return await query;
   };
 
-  static getAllMouvements = async (filter = {}) => {
-    return await mouvementStockModel
-      .find(filter)
+  static getAllMouvements = async (queryParams = {}) => {
+    const query = mouvementStockModel
+      .find()
       .populate('article_id')
       .populate('user_id')
       .populate('achat_id')
-      .populate('vente_id')
-      .sort({ createdAt: -1 });
+      .populate('vente_id');
+    return await applyApiFeatures(query, queryParams, {
+      searchFields: ['motif'],
+      filterFields: ['typeMouvement', 'article_id', 'user_id'],
+      allowedSortFields: ['dateMouvement', 'quantite', 'typeMouvement', 'createdAt'],
+      defaultSort: { createdAt: -1 },
+      aliases: { search: 'q', type: 'typeMouvement' },
+    });
   };
 
   static getMouvementsByArticle = async (articleId) => {

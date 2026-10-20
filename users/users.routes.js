@@ -44,9 +44,44 @@ router.post("/", verifyAccessToken, authorize('admin'), validate(createUserSchem
  *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [admin, gestionnaire, caissier, client]
+ *         description: "Filtrer directement par rôle d'utilisateur"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: "Recherche textuelle par nom, prénom, login, email ou téléphone"
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [nom, prenom, login, email, role, createdAt]
+ *           default: createdAt
+ *         description: "Champ de tri"
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
  *     responses:
  *       200:
  *         description: Liste des utilisateurs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/User' }
  */
 router.get("/all", verifyAccessToken, authorize('admin', 'gestionnaire'), UserController.getAllUsers);
 

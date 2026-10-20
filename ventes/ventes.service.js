@@ -208,8 +208,8 @@ class VenteService {
     };
   };
 
-  static getAllVentes = async () => {
-    return await VenteRepository.getAllVentes();
+  static getAllVentes = async (queryParams = {}) => {
+    return await VenteRepository.getAllVentes(queryParams);
   };
 
   static getVentesByClient = async (clientId) => {

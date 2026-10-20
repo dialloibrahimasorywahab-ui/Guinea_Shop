@@ -54,8 +54,8 @@ class UserService {
     return await UserRepository.getUserById(id);
   };
 
-  static getAllUsers = async () => {
-    const users = await UserRepository.getAllUsers();
+  static getAllUsers = async (queryParams = {}) => {
+    const users = await UserRepository.getAllUsers(queryParams);
     return users.map(
       (user) =>
         new GetAllUsersDto(

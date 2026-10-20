@@ -15,6 +15,37 @@ const router = express.Router();
  *     tags: [Achats]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: statut
+ *         schema:
+ *           type: string
+ *           enum: [en_attente, reçu, annulé]
+ *         description: "Filtrer par statut d'achat"
+ *       - in: query
+ *         name: fournisseur_id
+ *         schema:
+ *           type: string
+ *         description: "Filtrer par ID fournisseur"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: "Recherche par numéro d'achat"
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [dateAchat, montantTotal, statut, createdAt]
+ *           default: createdAt
+ *         description: "Champ de tri"
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: "Ordre de tri : ascendant (asc) ou descendant (desc)"
  *     responses:
  *       200:
  *         description: Liste de tous les achats
